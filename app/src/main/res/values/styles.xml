@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <style name="CPBgreen" parent="AppTheme">
+        <item name="colorAccent">#97cf01</item>
+    </style>
+    <style name="CPBred" parent="AppTheme">
+        <item name="colorAccent">#ef5350</item>
+    </style>
+    <style name="CPBblue" parent="AppTheme">
+        <item name="colorAccent">#80d8ff</item>
+    </style>
+    <style name="CPBgray" parent="AppTheme">
+        <item name="colorAccent">#e0e0e0</item>
+    </style>
+    <style name="CPBpurple" parent="AppTheme">
+        <item name="colorAccent">#e1bee7</item>
+    </style>
+
+</resources>

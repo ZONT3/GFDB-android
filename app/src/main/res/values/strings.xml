@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Girls\' Frontline DB</string>
+    <string name="load_loading">Loading…</string>
+    <string name="load_dl">Downloading T-Doll list…</string>
+    <string name="load_writing">Writing to cache…</string>
+    <string name="main_library">Library</string>
+    <string name="lib_noresults">There are no dolls matching your filters</string>
+    <string name="lib_reset">Reset filters</string>
+    <string name="load_parsing">Parsing…</string>
+    <string name="load_error">An error occurred while parsing one of t-dolls.</string>
+    <string name="load_preparing">Preparing…</string>
+    <string name="load_tdl">T-Doll list</string>
+    <string name="load_tnl">Thumbnail URLs</string>
+    <string name="load_aux">Debug doc</string>
+    <string name="card_info">Information</string>
+    <string name="card_cgs">CGs</string>
+    <string name="card_menu_link">Gamepress.gg link</string>
+    <string name="card_pattern">Buff Pattern</string>
+    <string name="load_stat">Stat values</string>
+</resources>

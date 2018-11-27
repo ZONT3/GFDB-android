@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1a237e</color>
+    <color name="colorPrimaryDark">#131b68</color>
+    <color name="colorAccent">#ffab00</color>
+    <color name="text_shadow">#7F000000</color>
+    <color name="rarity_common">#cfd8dc</color>
+    <color name="rarity_rare">#0288d1</color>
+    <color name="rarity_epic">#64dd17</color>
+    <color name="rarity_legend">#f57c00</color>
+    <color name="colorTabBackground">#212121</color>
+</resources>
