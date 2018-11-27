@@ -245,6 +245,13 @@ public class CardActivity extends AppCompatActivity {
                 return;
             }
 
+            if (exceptions.size() > 0) {
+                StringBuilder sb = new StringBuilder("Error on parsing:");
+                for (NetParser.ParserException e : exceptions)
+                    sb.append("\n").append(e.getMessage());
+                Toast.makeText(wr.get(), sb.toString(), Toast.LENGTH_LONG).show();
+            }
+
             ImageView cg = wr.get().findViewById(R.id.card_maincg);
             TextView roles = wr.get().findViewById(R.id.card_role);
             ProgressBar pbHP = wr.get().findViewById(R.id.card_pb_hp);
