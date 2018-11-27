@@ -42,6 +42,7 @@ public class LoadActivity extends AppCompatActivity {
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
 
         Date date = Calendar.getInstance().getTime();
+        date.setTime(System.currentTimeMillis());
         File dateFile = new File(getCacheDir(), "lastupd");
         boolean upd = false;
         if (!dateFile.exists()) {

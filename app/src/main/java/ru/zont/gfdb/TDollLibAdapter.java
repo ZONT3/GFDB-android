@@ -34,7 +34,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     static final int SORT_ID = 0;
 
     private static final int[] RARITY_TABLE = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
-                                                    R.color.rarity_epic, R.color.rarity_legend};
+                                                    R.color.rarity_epic, R.color.rarity_legend, R.color.rarity_extra};
 
     private WeakReference<LibraryActivity> weakReference;
 
@@ -85,7 +85,9 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         switch (sort) {
             case SORT_ID:
                 StringBuilder id_builder = new StringBuilder();
-                for (int i = 0; i < doll.getRarity(); i++) id_builder.append("★");
+                if (doll.getRarity() < 6)
+                    for (int i = 0; i < doll.getRarity(); i++) id_builder.append("★");
+                else id_builder.append("EXTRA");
                 holder.mMeta.setText(id_builder);
                 holder.mMeta.setTextColor(ResourcesCompat.getColor(weakReference.get().getResources(), RARITY_TABLE[doll.getRarity()], null));
                 holder.mType.setText(doll.getClss());

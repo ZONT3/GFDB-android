@@ -38,9 +38,9 @@
             android:layout_marginEnd="4dp"
             android:minHeight="80dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lib_item_meta"
+            app:layout_constraintBottom_toTopOf="@id/lib_item_title"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
@@ -52,8 +52,7 @@
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lib_item_thumb" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/lib_item_type"
@@ -71,7 +70,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/lib_item_thumb"
-            app:layout_constraintTop_toTopOf="@+id/lib_item_thumb" />
+            app:layout_constraintTop_toBottomOf="@id/lib_item_meta" />
 
         <ProgressBar
             android:id="@+id/lib_item_pb"

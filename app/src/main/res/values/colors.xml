@@ -8,5 +8,6 @@
     <color name="rarity_rare">#0288d1</color>
     <color name="rarity_epic">#64dd17</color>
     <color name="rarity_legend">#f57c00</color>
+    <color name="rarity_extra">#9776a9</color>
     <color name="colorTabBackground">#212121</color>
 </resources>

@@ -5,11 +5,13 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,9 +45,9 @@ import ru.zont.gfdb.core.NetParser;
 import ru.zont.gfdb.core.TDoll;
 
 public class CardActivity extends AppCompatActivity {
-    private static final String[] RARITY_TABLE = {"", "", "★★", "★★★", "★★★★", "★★★★★"};
+    private static final String[] RARITY_TABLE = {"", "", "★★", "★★★", "★★★★", "★★★★★", "EXTRA"};
     private static final int[] RARITY_TABLE_COLOR = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
-            R.color.rarity_epic, R.color.rarity_legend};
+            R.color.rarity_epic, R.color.rarity_legend, R.color.rarity_extra};
     private static final int[][] PATTERN_TABLE = {
             {R.id.card_pattern_1, R.id.card_pattern_4, R.id.card_pattern_7},
             {R.id.card_pattern_2, R.id.card_pattern_5, R.id.card_pattern_8},
@@ -246,10 +248,29 @@ public class CardActivity extends AppCompatActivity {
             }
 
             if (exceptions.size() > 0) {
-                StringBuilder sb = new StringBuilder("Error on parsing:");
+                StringBuilder sb = new StringBuilder();
                 for (NetParser.ParserException e : exceptions)
-                    sb.append("\n").append(e.getMessage());
-                Toast.makeText(wr.get(), sb.toString(), Toast.LENGTH_LONG).show();
+                    sb.append(e.getElementName())
+                            .append(exceptions.indexOf(e) != exceptions.size()-1
+                                    ? ", "
+                                    : "");
+                Snackbar.make(wr.get().findViewById(R.id.card_root), wr.get().getString(R.string.card_parserr, sb.toString()), Snackbar.LENGTH_LONG)
+                        .setAction(R.string.card_parserr_details, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                StringBuilder sb = new StringBuilder();
+                                for (NetParser.ParserException e : exceptions) {
+                                    sb.append(e.getMessage()).append(
+                                            exceptions.indexOf(e) != exceptions.size()-1
+                                                    ? ";\n\n"
+                                                    : "");
+                                }
+                                new AlertDialog.Builder(wr.get())
+                                        .setTitle(R.string.card_parserr_details_title)
+                                        .setMessage(sb.toString())
+                                        .create().show();
+                            }
+                        }).show();
             }
 
             ImageView cg = wr.get().findViewById(R.id.card_maincg);

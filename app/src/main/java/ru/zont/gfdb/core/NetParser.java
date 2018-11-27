@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -61,7 +62,7 @@ public class NetParser {
             case TNLIST:
                 File gftw = new File(context.getCacheDir(), "gftw.html");
                 if (gftw.exists()) gftw.delete();
-                new BufferedWriter(new FileWriter(gftw)).write(Jsoup.connect("https://gf.fws.tw/db/guns/alist").get().toString());
+                new FileOutputStream(gftw).getChannel().transferFrom(Channels.newChannel(new URL("https://gf.fws.tw/db/guns/alist").openStream()), 0, Long.MAX_VALUE);
                 gftwFile = gftw;
                 break;
             case STATLIST:
@@ -128,12 +129,14 @@ public class NetParser {
             if (!entry.get("id").equals(doll.id+"")) continue;
             Element gftwentry = null;
             for (Element e : gftw.getElementsByClass("gun_card_list")) {
-                if (e.getElementsByTag("span")
-                        .first().text().replaceAll("No\\.", "")
-                        .equals(doll.id+"")) {
-                    gftwentry = e;
-                    break;
-                }
+                try {
+                    if (e.getElementsByAttributeValueStarting("href", "/db/guns/info/").first()
+                            .attr("href").replace("/db/guns/info/", "")
+                            .equals(doll.id + "")) {
+                        gftwentry = e;
+                        break;
+                    }
+                } catch (Exception ignored) {}
             }
             try {
                 if (doll.parsingLevel <= 0) {
@@ -144,7 +147,7 @@ public class NetParser {
                     doll.name = entry.get("title");
                     doll.lvl2 = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
                     doll.clss = entry.get("tdoll_class");
-                    doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", ""));
+                    doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", "").replace("ex", "6"));
                     doll.craft = entry.get("field_t_doll_craft_time");
                     doll.acc = Integer.parseInt(entry.get("acc"));
                     doll.dmg = Integer.parseInt(entry.get("dmg"));
@@ -210,7 +213,7 @@ public class NetParser {
                             for (int j = 0; j < doll.pattern[i].length; j++) {
                                 if (adjTds.get(j).hasAttr("class")) doll.pattern[i][j] = 1;
                                 else if (selfTds.get(j).hasAttr("class")) doll.pattern[i][j] = 2;
-                                else doll.pattern[i][j] = 0;
+                                else doll.pattern[i][2-j] = 0;
                             }
                         }
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "pattern", pe)); }
@@ -265,8 +268,12 @@ public class NetParser {
     }
 
     public class ParserException extends IOException {
+        private String elementName;
         private ParserException(TDoll doll, String elementName, Exception e) {
             super(String.format("Cannot parse %s's %s: %s", doll.getName(), elementName, e.getMessage()));
+            this.elementName = elementName;
         }
+
+        public String getElementName() { return elementName; }
     }
 }

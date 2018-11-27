@@ -17,4 +17,9 @@
     <string name="card_menu_link">Gamepress.gg link</string>
     <string name="card_pattern">Buff Pattern</string>
     <string name="load_stat">Stat values</string>
+    <string name="card_parserr">Error while parsing:\n%s</string>
+    <string name="card_parserr_details">Details…</string>
+    <string name="card_parserr_details_title">Parser errors</string>
+    <string name="main_menu_reload">Reload DB</string>
+    <string name="main_menu_settings">Settings</string>
 </resources>
