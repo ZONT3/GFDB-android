@@ -110,10 +110,10 @@ public class NetParser {
         return list;
     }
 
-    public boolean parseDoll(TDoll doll, int level) {
-
+    public ArrayList<ParserException> parseDoll(TDoll doll, int level) {
+        ArrayList<ParserException> exceptions = new ArrayList<>();
         if (list == null || gftw == null || stats == null) {
-            if (jsonFile == null || gftwFile == null || statFile == null) return false;
+            if (jsonFile == null || gftwFile == null || statFile == null) return null;
             try {
                 Type type = new TypeToken<ArrayList<HashMap<String, String>>>() {}.getType();
                 list = new Gson().fromJson(new JsonReader(new FileReader(jsonFile)), type);
@@ -121,10 +121,9 @@ public class NetParser {
                 gftw = Jsoup.parse(gftwFile, "UTF-8").body();
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return null;
             }
         }
-        ArrayList<ParserException> exceptions = new ArrayList<>();
         for (HashMap<String, String> entry : list) {
             if (!entry.get("id").equals(doll.id+"")) continue;
             Element gftwentry = null;
@@ -168,52 +167,77 @@ public class NetParser {
 
                     doll.costitles = new ArrayList<>();
                     doll.costumes = new ArrayList<>();
-                    Elements costumes = root.getElementsByClass("costume-row-item");
-                    if (costumes.size()%2>0) { Log.e("PARSER_ERROR", "T-Doll ID"+doll.id+"; Invalid costumes count"); return false; }
-                    for (int i = 0; i < costumes.size(); i+=2) {
-                        Element normal = costumes.get(i);
-                        Element dmg = costumes.get(i+1);
-
-                        doll.costitles.add(normal.parent().parent().parent().getElementsByTag("span").first().text());
-                        doll.costumes.add(new URL[]{
-                                new URL(normal.getElementsByAttribute("href").first().attr("href")),
-                                new URL(dmg.getElementsByAttribute("href").first().attr("href"))
-                        });
-                    }
-
-                    Elements roles = root.getElementsByAttributeValueContaining("class", "t-doll-roles");
-                    if (roles.size() > 0) {
-                        StringBuilder b = new StringBuilder();
-                        for (Element e : roles.first().getElementsByClass("field__item"))
-                            b.append(" ").append(e.text());
-                        doll.role = b.toString().replaceFirst(" ", "");
-                    }
-
-                    Element p = root.getElementsContainingOwnText("History").first().nextElementSibling();
-                    if (p.tagName().equals("p")) doll.description = p.text();
-
-                    Elements adjTrs = root.getElementsByAttributeValue("id", "adj-tile").first().getElementsByTag("tr");
-                    Elements selfTrs = root.getElementsByAttributeValue("id", "self-pos-tile").first().getElementsByTag("tr");
-                    doll.pattern = new int[3][3];
-                    for (int i = 0; i < doll.pattern.length; i++) {
-                        Elements adjTds = adjTrs.get(i).getElementsByTag("td");
-                        Elements selfTds = selfTrs.get(i).getElementsByTag("td");
-                        for (int j = 0; j < doll.pattern[i].length; j++) {
-                            if (adjTds.get(j).hasAttr("class")) doll.pattern[i][j] = 1;
-                            else if (selfTds.get(j).hasAttr("class")) doll.pattern[i][j] = 2;
-                            else doll.pattern[i][j] = 0;
+                    try {
+                        Elements costumes = root.getElementsByClass("costume-row-item");
+                        if (costumes.size() % 2 > 0) {
+                            Log.e("PARSER_ERROR", "T-Doll ID" + doll.id + "; Invalid costumes count");
+                            throw new Exception("Invalid costumes count");
                         }
+                        for (int i = 0; i < costumes.size(); i += 2) {
+                            Element normal = costumes.get(i);
+                            Element dmg = costumes.get(i + 1);
+
+                            doll.costitles.add(normal.parent().parent().parent().getElementsByTag("span").first().text());
+                            doll.costumes.add(new URL[]{
+                                    new URL(normal.getElementsByAttribute("href").first().attr("href")),
+                                    new URL(dmg.getElementsByAttribute("href").first().attr("href"))
+                            });
+                        }
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Aux CG", pe)); }
+
+                    try {
+                        Elements roles = root.getElementsByAttributeValueContaining("class", "t-doll-roles");
+                        if (roles.size() > 0) {
+                            StringBuilder b = new StringBuilder();
+                            for (Element e : roles.first().getElementsByClass("field__item"))
+                                b.append(" ").append(e.text());
+                            doll.role = b.toString().replaceFirst(" ", "");
+                        }
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Roles", pe)); doll.role = ""; }
+
+                    try {
+                        Element p = root.getElementsContainingOwnText("History").first().nextElementSibling();
+                        if (p.tagName().equals("p")) doll.description = p.text();
+                    }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.role = ""; }
+
+                    try {
+                        Elements adjTrs = root.getElementsByAttributeValue("id", "adj-tile").first().getElementsByTag("tr");
+                        Elements selfTrs = root.getElementsByAttributeValue("id", "self-pos-tile").first().getElementsByTag("tr");
+                        doll.pattern = new int[3][3];
+                        for (int i = 0; i < doll.pattern.length; i++) {
+                            Elements adjTds = adjTrs.get(i).getElementsByTag("td");
+                            Elements selfTds = selfTrs.get(i).getElementsByTag("td");
+                            for (int j = 0; j < doll.pattern[i].length; j++) {
+                                if (adjTds.get(j).hasAttr("class")) doll.pattern[i][j] = 1;
+                                else if (selfTds.get(j).hasAttr("class")) doll.pattern[i][j] = 2;
+                                else doll.pattern[i][j] = 0;
+                            }
+                        }
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "pattern", pe)); }
+
+                    try {
+                        doll.affect = root.getElementsByClass("adj-effects").first().text().replace("Affects ", "");
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Affect", pe)); doll.affect = ""; }
+                    try {
+                        doll.buffs = root.getElementsByClass("adj-bonus").first().getElementsByTag("table").first().toString();
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Buffs", pe)); doll.buffs = ""; }
+                    try {
+                        doll.skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling().toString();
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = ""; }
+
+                    try {
+                        doll.hpBar = (int) ((float) doll.hp / (float) getHighest("hp", stats) * 100);
+                        doll.dmgBar = (int) ((float) doll.dmg / (float) getHighest("dmg", stats) * 100);
+                        doll.accBar = (int) ((float) doll.acc / (float) getHighest("acc", stats) * 100);
+                        doll.evaBar = (int) ((float) doll.eva / (float) getHighest("eva", stats) * 100);
+                        doll.rofBar = (int) ((float) doll.rof / (float) getHighest("rof", stats) * 100);
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Bars", pe));
+                        doll.hpBar = 0;
+                        doll.dmgBar = 0;
+                        doll.accBar = 0;
+                        doll.evaBar = 0;
+                        doll.rofBar = 0;
                     }
-
-                    doll.affect = root.getElementsByClass("adj-effects").first().text().replace("Affects ", "");
-                    doll.buffs = root.getElementsByClass("adj-bonus").first().getElementsByTag("table").first().toString();
-                    doll.skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling().toString();
-
-                    doll.hpBar = (int)((float)doll.hp / (float)getHighest("hp", stats) * 100);
-                    doll.dmgBar = (int)((float)doll.dmg / (float)getHighest("dmg", stats) * 100);
-                    doll.accBar = (int)((float)doll.acc / (float)getHighest("acc", stats) * 100);
-                    doll.evaBar = (int)((float)doll.eva / (float)getHighest("eva", stats) * 100);
-                    doll.rofBar = (int)((float)doll.rof / (float)getHighest("rof", stats) * 100);
 
 //                    doll.hpBar = (int) Float.parseFloat(root.getElementsByAttributeValue("id", "hp-bar").first().attr("style")
 //                            .replaceAll("[^0-9.]", ""));
@@ -226,10 +250,10 @@ public class NetParser {
 //                    doll.rofBar = (int) Float.parseFloat(root.getElementsByAttributeValue("id", "res-bar").first().attr("style")
 //                            .replaceAll("[^0-9.]", ""));
                 }
-            } catch (Exception e) { Log.e("PARSER_ERROR", "T-Doll ID"+doll.id); e.printStackTrace(); return false; }
+            } catch (Exception e) { Log.e("PARSER_ERROR", "T-Doll ID"+doll.id); e.printStackTrace(); return null; }
             break;
         }
-        return true;
+        return exceptions;
     }
 
     private static int getHighest(String key, ArrayList<HashMap<String, String>> list) {

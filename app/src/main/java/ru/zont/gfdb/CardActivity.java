@@ -46,6 +46,10 @@ public class CardActivity extends AppCompatActivity {
     private static final String[] RARITY_TABLE = {"", "", "★★", "★★★", "★★★★", "★★★★★"};
     private static final int[] RARITY_TABLE_COLOR = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
             R.color.rarity_epic, R.color.rarity_legend};
+    private static final int[][] PATTERN_TABLE = {
+            {R.id.card_pattern_1, R.id.card_pattern_4, R.id.card_pattern_7},
+            {R.id.card_pattern_2, R.id.card_pattern_5, R.id.card_pattern_8},
+            {R.id.card_pattern_3, R.id.card_pattern_6, R.id.card_pattern_9}};
 
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
@@ -216,6 +220,7 @@ public class CardActivity extends AppCompatActivity {
     private static class Lvl2Parser extends AsyncTask<TDoll, Void, TDoll> {
         WeakReference<CardActivity> wr;
         boolean done = false;
+        ArrayList<NetParser.ParserException> exceptions;
 
         Lvl2Parser(WeakReference<CardActivity> wr) { this.wr = wr; }
 
@@ -223,7 +228,8 @@ public class CardActivity extends AppCompatActivity {
         protected TDoll doInBackground(TDoll... tDolls) {
             try {
                 NetParser parser = new NetParser(wr.get(), -1);
-                if (!parser.parseDoll(tDolls[0], 2)) return null;
+                exceptions = parser.parseDoll(tDolls[0], 2);
+                if (exceptions == null) return null;
             } catch (IOException e) { e.printStackTrace(); return null; }
             return tDolls[0];
         }
@@ -252,7 +258,7 @@ public class CardActivity extends AppCompatActivity {
             TextView description = wr.get().findViewById(R.id.card_desc);
             final ProgressBar cgPb = wr.get().findViewById(R.id.card_cgpb);
 
-            if (cg!=null)
+            if (cg!=null && tDoll.getCgMain() != null && tDoll.getCgDamage() != null)
                 Glide.with(wr.get())
                         .load(tDoll.getCgMain().toString())
                         .apply(new RequestOptions()
@@ -289,6 +295,19 @@ public class CardActivity extends AppCompatActivity {
             urls.addAll(tDoll.getCostumes());
             rw.setLayoutManager(new LinearLayoutManager(wr.get(), LinearLayoutManager.VERTICAL, false));
             rw.setAdapter(new CgAdapter(urls));
+
+            if (tDoll.getPattern() != null) {
+                for (int x = 0; x < tDoll.getPattern().length; x++) {
+                    for (int y = 0; y < tDoll.getPattern()[x].length; y++) {
+                        ImageView iw = wr.get().findViewById(PATTERN_TABLE[x][y]);
+                        switch (tDoll.getPattern()[x][y]) {
+                            case 1: iw.setImageResource(android.R.color.holo_blue_bright); break;
+                            case 2: iw.setImageResource(android.R.color.white); break;
+                            default: iw.setImageResource(android.R.color.darker_gray); break;
+                        }
+                    }
+                }
+            }
 
             done = true;
             wr.get().checkAsyncTasks();

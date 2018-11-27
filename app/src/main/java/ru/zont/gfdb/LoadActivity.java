@@ -165,7 +165,7 @@ public class LoadActivity extends AppCompatActivity {
             for (int i = 0; i < list.size(); i++) {
                 TDoll doll = list.get(i);
                 publishProgress(CODE_PARSING, i, list.size(), 0);
-                if (!parser.parseDoll(doll, 1)) publishProgress(CODE_ERROR,0,0,0);
+                if (parser.parseDoll(doll, 1) == null) publishProgress(CODE_ERROR,0,0,0);
                 //try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
             }
 

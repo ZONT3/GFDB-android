@@ -297,7 +297,7 @@
                         <ImageView
                             android:id="@+id/card_pattern_4"
                             android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:contentDescription="@string/card_pattern"
                             android:padding="3dp"
