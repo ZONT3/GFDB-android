@@ -1,5 +1,7 @@
 package ru.zont.gfdb.core;
 
+import android.annotation.SuppressLint;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,10 +31,13 @@ public class TDoll implements Serializable {
 
     protected URL thumb;
     protected URL lvl2;
+    protected URL lvl2fws;
 
     // ---------------------- LEVEL 2 PARSING
     protected URL cgMain;
     protected URL cgDamage;
+    protected URL cgMainHQ;
+    protected URL cgDamageHQ;
     protected ArrayList<String> costitles;
     protected ArrayList<URL[]> costumes;
 
@@ -55,6 +60,12 @@ public class TDoll implements Serializable {
 
     public String getCraft() { return craft; }
 
+    public int getCraftMins() {
+        if (craft.equals("Unbuildable")) return Integer.MAX_VALUE;
+        return Integer.valueOf(craft.split(":")[0]) * 60
+                + Integer.valueOf(craft.split(":")[1]);
+    }
+
     public int getHp() { return hp; }
 
     public int getDmg() { return dmg; }
@@ -70,6 +81,10 @@ public class TDoll implements Serializable {
     public URL getCgMain() { return cgMain; }
 
     public URL getCgDamage() { return cgDamage; }
+
+    public URL getCgMainHQ() { return cgMainHQ; }
+
+    public URL getCgDamageHQ() { return cgDamageHQ; }
 
     public ArrayList<URL[]> getCostumes() { return costumes; }
 
@@ -96,4 +111,20 @@ public class TDoll implements Serializable {
     public String getAffect() { return affect; }
 
     public String getBuffs() { return buffs; }
+
+    public URL getLvl2() { return lvl2; }
+
+    public URL getLvl2fws() { return lvl2fws; }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TDoll) return ((TDoll) obj).id == id;
+        return super.equals(obj);
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    public String toString() {
+        return String.format("[%d*] %s", rarity, name);
+    }
 }

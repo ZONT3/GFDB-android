@@ -31,6 +31,7 @@ public class LoadActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
 
@@ -154,7 +155,7 @@ public class LoadActivity extends AppCompatActivity {
                 publishProgress(CODE_DL, 0, 3, NetParser.TDLIST);
                 parser = new NetParser(contextReference.get(), NetParser.TDLIST);
                 publishProgress(CODE_DL, 1, 3, NetParser.TNLIST);
-                parser.prepare(contextReference.get(), NetParser.TNLIST);;
+                parser.prepare(contextReference.get(), NetParser.TNLIST);
                 publishProgress(CODE_DL, 2, 3, NetParser.STATLIST);
                 parser.prepare(contextReference.get(), NetParser.STATLIST);
 //                publishProgress(CODE_DL, 3, 4, NetParser.AUX);
@@ -186,11 +187,12 @@ public class LoadActivity extends AppCompatActivity {
         }
     }
 
-    static TDolls getCachedList(AppCompatActivity context) {
-        File file = new File(context.getCacheDir(), "cachedList");
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    static TDolls getCachedList(AppCompatActivity activity) {
+        File file = new File(activity.getCacheDir(), "cachedList");
         if (!file.exists()) {
-            context.startActivity(new Intent(context, LoadActivity.class));
-            context.finish();
+            activity.startActivity(new Intent(activity, LoadActivity.class));
+            activity.finish();
         }
 
         TDolls res = null;
@@ -199,7 +201,12 @@ public class LoadActivity extends AppCompatActivity {
             ObjectInputStream ois = new ObjectInputStream(fis);
             res = (TDolls) ois.readObject();
             ois.close();
-        } catch (IOException | ClassNotFoundException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+            new File(activity.getCacheDir(), "lastupd").delete();
+            activity.startActivity(new Intent(activity, LoadActivity.class));
+            activity.finish();
+        } catch (ClassNotFoundException e) { e.printStackTrace(); }
         return res;
     }
 }

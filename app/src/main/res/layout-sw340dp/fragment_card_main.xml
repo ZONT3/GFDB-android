@@ -20,40 +20,55 @@
                 android:layout_height="wrap_content"
                 tools:showIn="@layout/activity_card">
 
-                <ImageView
-                    android:id="@+id/card_maincg"
-                    android:layout_width="0dp"
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/card_cgholder"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_marginEnd="72dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/card_constr"
-                    tools:src="@tools:sample/avatars" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <ProgressBar
-                    android:id="@+id/card_cgpb"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    app:layout_constraintEnd_toEndOf="@+id/card_maincg"
-                    app:layout_constraintStart_toStartOf="@+id/card_maincg"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <ImageView
+                        android:id="@+id/card_maincg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:src="@tools:sample/avatars" />
+
+                    <ProgressBar
+                        android:id="@+id/card_cgpb"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="@drawable/pb_background"
+                        android:indeterminate="true"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="@+id/card_maincg"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </android.support.constraint.ConstraintLayout>
 
                 <TextView
                     android:id="@+id/card_role"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="64dp"
-                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="64dp"
                     android:text="Ultra Russsian DPS, Latvian UFO, Ukraine Salo, Belorussian Potato, Litvian Pizdauskas"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Material.Small"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/card_maincg" />
+                    app:layout_constraintTop_toBottomOf="@+id/card_cgholder" />
 
                 <TextView
                     android:id="@+id/card_build"

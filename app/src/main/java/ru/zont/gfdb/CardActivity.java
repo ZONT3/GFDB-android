@@ -1,8 +1,12 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,7 +17,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -56,6 +59,8 @@ public class CardActivity extends AppCompatActivity {
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
     private ProgressBar loadingPb;
+
+    private TDoll doll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +176,8 @@ public class CardActivity extends AppCompatActivity {
                 return;
             }
 
+            wr.get().doll = tDoll;
+
             TextView roles = wr.get().findViewById(R.id.card_role);
             TextView build = wr.get().findViewById(R.id.card_build);
             TextView hp = wr.get().findViewById(R.id.card_hp);
@@ -207,11 +214,11 @@ public class CardActivity extends AppCompatActivity {
             acc.setText(tDoll.getAcc()+"");
             eva.setText(tDoll.getEva()+"");
             rof.setText(tDoll.getRof()+"");
-            pbHP.setMax(1); pbHP.setProgress(0);
-            pbDMG.setMax(1); pbDMG.setProgress(0);
-            pbACC.setMax(1); pbACC.setProgress(0);
-            pbEVA.setMax(1); pbEVA.setProgress(0);
-            pbROF.setMax(1); pbROF.setProgress(0);
+            pbHP.setMax(100); pbHP.setProgress(tDoll.getHpBar());
+            pbDMG.setMax(100); pbDMG.setProgress(tDoll.getDmgBar());
+            pbACC.setMax(100); pbACC.setProgress(tDoll.getAccBar());
+            pbEVA.setMax(100); pbEVA.setProgress(tDoll.getEvaBar());
+            pbROF.setMax(100); pbROF.setProgress(tDoll.getRofBar());
 
             done = true;
             wr.get().parser2 = new Lvl2Parser(wr);
@@ -275,11 +282,6 @@ public class CardActivity extends AppCompatActivity {
 
             ImageView cg = wr.get().findViewById(R.id.card_maincg);
             TextView roles = wr.get().findViewById(R.id.card_role);
-            ProgressBar pbHP = wr.get().findViewById(R.id.card_pb_hp);
-            ProgressBar pbDMG = wr.get().findViewById(R.id.card_pb_dmg);
-            ProgressBar pbACC = wr.get().findViewById(R.id.card_pb_acc);
-            ProgressBar pbEVA = wr.get().findViewById(R.id.card_pb_eva);
-            ProgressBar pbROF = wr.get().findViewById(R.id.card_pb_rof);
             TextView affects = wr.get().findViewById(R.id.card_affects);
             TextView buffs = wr.get().findViewById(R.id.card_buffs);
             TextView skills = wr.get().findViewById(R.id.card_skills);
@@ -307,11 +309,6 @@ public class CardActivity extends AppCompatActivity {
                         .into(cg);
 
             roles.setText(tDoll.getRole());
-            pbHP.setMax(100); pbHP.setProgress(tDoll.getHpBar());
-            pbDMG.setMax(100); pbDMG.setProgress(tDoll.getDmgBar());
-            pbACC.setMax(100); pbACC.setProgress(tDoll.getAccBar());
-            pbEVA.setMax(100); pbEVA.setProgress(tDoll.getEvaBar());
-            pbROF.setMax(100); pbROF.setProgress(tDoll.getRofBar());
             affects.setText("Affects "+tDoll.getAffect().toUpperCase());
             buffs.setText(Html.fromHtml(tDoll.getBuffs()));
             skills.setText(Html.fromHtml(tDoll.getSkills()));
@@ -319,10 +316,16 @@ public class CardActivity extends AppCompatActivity {
 
             RecyclerView rw = wr.get().findViewById(R.id.card_recycler);
             ArrayList<URL[]> urls = new ArrayList<>();
-            urls.add(new URL[] { tDoll.getCgMain(), tDoll.getCgDamage() });
+            ArrayList<String> titles = new ArrayList<>();
+            urls.add(new URL[] {
+                    tDoll.getCgMainHQ() != null ? tDoll.getCgMainHQ() : tDoll.getCgMain(),
+                    tDoll.getCgDamageHQ() != null ? tDoll.getCgDamageHQ() : tDoll.getCgDamage()
+            });
+            titles.add(wr.get().getString(R.string.card_cg_main));
             urls.addAll(tDoll.getCostumes());
+            titles.addAll(tDoll.getCostitles());
             rw.setLayoutManager(new LinearLayoutManager(wr.get(), LinearLayoutManager.VERTICAL, false));
-            rw.setAdapter(new CgAdapter(urls));
+            rw.setAdapter(new CgAdapter(urls, titles));
 
             if (tDoll.getPattern() != null) {
                 for (int x = 0; x < tDoll.getPattern().length; x++) {
@@ -342,21 +345,27 @@ public class CardActivity extends AppCompatActivity {
         }
 
         private static class CgAdapter extends RecyclerView.Adapter<CgAdapter.VH> {
+            private ArrayList<String> titles;
             private ArrayList<URL[]> dataset;
 
             static class VH extends RecyclerView.ViewHolder {
-                ImageView iw;
                 ProgressBar pb;
+                TextView title;
+                ImageView iw;
+                ImageView iwdmg;
 
                 VH(View itemView) {
                     super(itemView);
+                    title = itemView.findViewById(R.id.card_cg_title);
                     iw = itemView.findViewById(R.id.card_cg_iw);
+                    iwdmg = itemView.findViewById(R.id.card_cg_iw_dam);
                     pb = itemView.findViewById(R.id.card_cg_pb);
                 }
             }
 
-            CgAdapter(ArrayList<URL[]> urls) {
+            CgAdapter(ArrayList<URL[]> urls, ArrayList<String> titles) {
                 dataset = urls;
+                this.titles = titles;
             }
 
             @NonNull
@@ -367,32 +376,58 @@ public class CardActivity extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(@NonNull VH holder, int position) {
-                String url = dataset.get(position/2)[position%2].toString();
+                holder.title.setText(titles.get(position));
 
                 final ProgressBar fPB = holder.pb;
                 fPB.setVisibility(View.VISIBLE);
-                Glide.with(holder.itemView)
-                        .load(url)
-                        .apply(new RequestOptions().error(R.drawable.conprobl))
-                        .listener(new RequestListener<Drawable>() {
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                fPB.setVisibility(View.GONE);
-                                return false;
-                            }
 
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                fPB.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
+                RequestListener<Drawable> listener = new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        fPB.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        fPB.setVisibility(View.GONE);
+                        return false;
+                    }
+                };
+
+                Glide.with(holder.itemView)
+                        .load(dataset.get(position)[0].toString())
+                        .apply(new RequestOptions().error(R.drawable.conprobl))
+                        .listener(listener)
                         .into(holder.iw);
+                Glide.with(holder.itemView)
+                        .load(dataset.get(position)[1].toString())
+                        .apply(new RequestOptions().error(R.drawable.conprobl))
+                        .into(holder.iwdmg);
+
+                final String url = dataset.get(position)[0].toString();
+                final String urldm = dataset.get(position)[1].toString();
+                holder.iw.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        v.getContext().startActivity(
+                                new Intent(Intent.ACTION_VIEW)
+                                        .setDataAndType(Uri.parse(url), "image/*"));
+                    }
+                });
+                holder.iwdmg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        v.getContext().startActivity(
+                                new Intent(Intent.ACTION_VIEW)
+                                        .setDataAndType(Uri.parse(urldm), "image/*"));
+                    }
+                });
             }
 
             @Override
             public int getItemCount() {
-                return dataset.size()*2;
+                return dataset.size();
             }
 
         }
@@ -414,11 +449,21 @@ public class CardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.card_menu_link:
-
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.card_menu_link)
+                        .setItems(R.array.card_links, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2().toString()))); break;
+                                    case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2fws().toString()))); break;
+                                }
+                            }
+                        }).create().show();
                 return true;
-            case R.id.card_menu_mod3:
-
-                return true;
+//            case R.id.card_menu_mod3:
+//
+//                return true;
             default: return super.onOptionsItemSelected(item);
         }
     }

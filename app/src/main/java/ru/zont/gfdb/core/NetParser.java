@@ -62,7 +62,13 @@ public class NetParser {
             case TNLIST:
                 File gftw = new File(context.getCacheDir(), "gftw.html");
                 if (gftw.exists()) gftw.delete();
-                new FileOutputStream(gftw).getChannel().transferFrom(Channels.newChannel(new URL("https://gf.fws.tw/db/guns/alist").openStream()), 0, Long.MAX_VALUE);
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://gf.fws.tw/db/guns/alist").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(gftw)) {
+                    byte dataBuffer[] = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1)
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                } catch (IOException e) { e.printStackTrace(); }
                 gftwFile = gftw;
                 break;
             case STATLIST:
@@ -146,18 +152,35 @@ public class NetParser {
                     else doll.thumb = new URL("https://gamepress.gg" + entry.get("icon").replaceAll("\\\\", ""));
                     doll.name = entry.get("title");
                     doll.lvl2 = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
+                    if (gftwentry != null) doll.lvl2fws = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
                     doll.clss = entry.get("tdoll_class");
                     doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", "").replace("ex", "6"));
-                    doll.craft = entry.get("field_t_doll_craft_time");
+                    doll.craft = entry.get("field_t_doll_craft_time"); if (doll.craft.isEmpty()) doll.craft = "Unbuildable";
                     doll.acc = Integer.parseInt(entry.get("acc"));
                     doll.dmg = Integer.parseInt(entry.get("dmg"));
                     doll.eva = Integer.parseInt(entry.get("eva"));
                     doll.hp = Integer.parseInt(entry.get("hp"));
                     doll.rof = Integer.parseInt(entry.get("rof"));
+                    try {
+                        doll.hpBar = (int) ((float) doll.hp / (float) getHighest("hp", stats) * 100);
+                        doll.dmgBar = (int) ((float) doll.dmg / (float) getHighest("dmg", stats) * 100);
+                        doll.accBar = (int) ((float) doll.acc / (float) getHighest("acc", stats) * 100);
+                        doll.evaBar = (int) ((float) doll.eva / (float) getHighest("eva", stats) * 100);
+                        doll.rofBar = (int) ((float) doll.rof / (float) getHighest("rof", stats) * 100);
+                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Bars", pe));
+                        doll.hpBar = 0;
+                        doll.dmgBar = 0;
+                        doll.accBar = 0;
+                        doll.evaBar = 0;
+                        doll.rofBar = 0;
+                    }
                     doll.parsingLevel = 1;
                 }
                 if (level > 1 && doll.parsingLevel <= 1) {
                     Element root = Jsoup.connect(doll.lvl2.toString()).get().body();
+                    Element gftwRoot = null;
+                    if (gftwentry != null)
+                        gftwRoot = Jsoup.connect(doll.lvl2fws.toString()).get().body();
 
                     try {
                         doll.cgMain = new URL("http://gamepress.gg"
@@ -167,6 +190,17 @@ public class NetParser {
                                 + root.getElementsByAttributeValue("id", "tab-2-img").first()
                                 .getElementsByTag("img").first().attr("src"));
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Main CG", pe)); }
+
+                    if (gftwRoot != null) {
+                        try {
+                            doll.cgMainHQ = new URL("http://gf.fws.tw"
+                                    + gftwRoot.getElementsByClass("img-thumbnail").first().attr("src"));
+                            doll.cgDamageHQ = new URL("http://gf.fws.tw"
+                                    + gftwRoot.getElementsByClass("img-thumbnail").get(1).attr("src"));
+                        } catch (Exception pe) {
+                            exceptions.add(new ParserException(doll, "Main CG HQ", pe));
+                        }
+                    }
 
                     doll.costitles = new ArrayList<>();
                     doll.costumes = new ArrayList<>();
@@ -228,20 +262,6 @@ public class NetParser {
                         doll.skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling().toString();
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = ""; }
 
-                    try {
-                        doll.hpBar = (int) ((float) doll.hp / (float) getHighest("hp", stats) * 100);
-                        doll.dmgBar = (int) ((float) doll.dmg / (float) getHighest("dmg", stats) * 100);
-                        doll.accBar = (int) ((float) doll.acc / (float) getHighest("acc", stats) * 100);
-                        doll.evaBar = (int) ((float) doll.eva / (float) getHighest("eva", stats) * 100);
-                        doll.rofBar = (int) ((float) doll.rof / (float) getHighest("rof", stats) * 100);
-                    } catch (Exception pe) { exceptions.add(new ParserException(doll, "Bars", pe));
-                        doll.hpBar = 0;
-                        doll.dmgBar = 0;
-                        doll.accBar = 0;
-                        doll.evaBar = 0;
-                        doll.rofBar = 0;
-                    }
-
 //                    doll.hpBar = (int) Float.parseFloat(root.getElementsByAttributeValue("id", "hp-bar").first().attr("style")
 //                            .replaceAll("[^0-9.]", ""));
 //                    doll.dmgBar = (int) Float.parseFloat(root.getElementsByAttributeValue("id", "attack-bar").first().attr("style")
@@ -272,6 +292,7 @@ public class NetParser {
         private ParserException(TDoll doll, String elementName, Exception e) {
             super(String.format("Cannot parse %s's %s: %s", doll.getName(), elementName, e.getMessage()));
             this.elementName = elementName;
+            e.printStackTrace();
         }
 
         public String getElementName() { return elementName; }

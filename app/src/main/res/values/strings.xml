@@ -14,7 +14,7 @@
     <string name="load_aux">Debug doc</string>
     <string name="card_info">Information</string>
     <string name="card_cgs">CGs</string>
-    <string name="card_menu_link">Gamepress.gg link</string>
+    <string name="card_menu_link">Links</string>
     <string name="card_pattern">Buff Pattern</string>
     <string name="load_stat">Stat values</string>
     <string name="card_parserr">Error while parsing:\n%s</string>
@@ -22,4 +22,25 @@
     <string name="card_parserr_details_title">Parser errors</string>
     <string name="main_menu_reload">Reload DB</string>
     <string name="main_menu_settings">Settings</string>
+    <string name="card_cg_main">Default</string>
+    <string name="lib_menu_search">Search</string>
+    <string name="lib_menu_sort">Sort</string>
+    <string name="lib_menu_sort_reverse">Reverse</string>
+
+    <array name="card_links">
+        <item>English version (gamepress.gg)</item>
+        <item>Taiwan version (gf.fws.tw)</item>
+    </array>
+    <array name="lib_sort_arr">
+        <item>No.</item>
+        <item>Name</item>
+        <item>Rarity</item>
+        <item>Constr. time</item>
+        <item>Type</item>
+        <item>HP</item>
+        <item>DMG</item>
+        <item>ACC</item>
+        <item>EVA</item>
+        <item>ROF</item>
+    </array>
 </resources>
