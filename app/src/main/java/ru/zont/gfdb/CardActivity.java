@@ -52,9 +52,9 @@ public class CardActivity extends AppCompatActivity {
     private static final int[] RARITY_TABLE_COLOR = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
             R.color.rarity_epic, R.color.rarity_legend, R.color.rarity_extra};
     private static final int[][] PATTERN_TABLE = {
-            {R.id.card_pattern_1, R.id.card_pattern_4, R.id.card_pattern_7},
-            {R.id.card_pattern_2, R.id.card_pattern_5, R.id.card_pattern_8},
-            {R.id.card_pattern_3, R.id.card_pattern_6, R.id.card_pattern_9}};
+            {R.id.card_pattern_1, R.id.card_pattern_2, R.id.card_pattern_3},
+            {R.id.card_pattern_4, R.id.card_pattern_5, R.id.card_pattern_6},
+            {R.id.card_pattern_7, R.id.card_pattern_8, R.id.card_pattern_9}};
 
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
@@ -470,8 +470,8 @@ public class CardActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (parser1 != null) parser1.cancel(true);
         if (parser2 != null) parser2.cancel(true);
+        super.onDestroy();
     }
 }

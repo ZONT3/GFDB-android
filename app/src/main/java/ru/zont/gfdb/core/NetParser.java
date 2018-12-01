@@ -117,6 +117,7 @@ public class NetParser {
         return list;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public ArrayList<ParserException> parseDoll(TDoll doll, int level) {
         ArrayList<ParserException> exceptions = new ArrayList<>();
         if (list == null || gftw == null || stats == null) {
@@ -238,16 +239,19 @@ public class NetParser {
                     }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.role = ""; }
 
                     try {
-                        Elements adjTrs = root.getElementsByAttributeValue("id", "adj-tile").first().getElementsByTag("tr");
-                        Elements selfTrs = root.getElementsByAttributeValue("id", "self-pos-tile").first().getElementsByTag("tr");
+                        Elements gridColumns = gftwRoot.getElementsByAttributeValueStarting("class","effect_grid_x");
+                        ArrayList<Element> dl = new ArrayList<>();
+                        for (Element e : gridColumns)
+                            if (e.getElementsByAttributeValueStarting("class", "gun_grid").size() != 3)
+                                dl.add(e);
+                        for (Element e : dl) gridColumns.remove(e);
                         doll.pattern = new int[3][3];
-                        for (int i = 0; i < doll.pattern.length; i++) {
-                            Elements adjTds = adjTrs.get(i).getElementsByTag("td");
-                            Elements selfTds = selfTrs.get(i).getElementsByTag("td");
-                            for (int j = 0; j < doll.pattern[i].length; j++) {
-                                if (adjTds.get(j).hasAttr("class")) doll.pattern[i][j] = 1;
-                                else if (selfTds.get(j).hasAttr("class")) doll.pattern[i][j] = 2;
-                                else doll.pattern[i][2-j] = 0;
+                        for (int x = 0; x < gridColumns.size(); x++) {
+                            Elements cells = gridColumns.get(x).getElementsByAttributeValueStarting("class","gun_grid");
+                            for (int y = 0; y < cells.size(); y++) {
+                                if (cells.get(y).className().contains("center")) doll.pattern[x][y] = 2;
+                                else if (cells.get(y).className().contains("none")) doll.pattern[x][y] = 0;
+                                else doll.pattern[x][y] = 1;
                             }
                         }
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "pattern", pe)); }
