@@ -467,4 +467,11 @@ public class CardActivity extends AppCompatActivity {
             default: return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (parser1 != null) parser1.cancel(true);
+        if (parser2 != null) parser2.cancel(true);
+    }
 }

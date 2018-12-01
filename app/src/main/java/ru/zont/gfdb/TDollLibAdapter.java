@@ -222,13 +222,12 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     TDolls getDataset() { return dataset; }
 
     private void modifyDataset(TDolls newDataset) {
-        for (TDoll doll : newDataset) {
-            if (!dataset.contains(doll)) {
-                dataset.add(doll);
-                sort(true);
-                notifyItemInserted(dataset.indexOf(doll));
-            }
-        }
+        int oldSize = dataset.size();
+        for (TDoll doll : newDataset)
+            if (!dataset.contains(doll)) dataset.add(doll);
+        if (oldSize < dataset.size())
+            notifyItemRangeInserted(oldSize, dataset.size() - oldSize);
+
         TDolls temp = (TDolls) dataset.clone();
         for (TDoll doll : temp) {
             if (!newDataset.contains(doll)) {
@@ -238,11 +237,12 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                 notifyItemRangeChanged(pos, dataset.size());
             }
         }
+        sort();
     }
 
-    private void sort() { sort(false); }
+//    private void sort() { sort(false); }
 
-    private void sort(boolean silent) {
+    private void sort(/*boolean silent*/) {
         Comparator<TDoll> comparator = new Comparator<TDoll>() {
             @Override
             public int compare(TDoll o1, TDoll o2) {
@@ -267,7 +267,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
             for (int in = 0; in < out; in++) {       //Внутренний цикл
                 if(comparator.compare(dataset.get(in), dataset.get(in+1)) > 0) {
                     Collections.swap(dataset, in, in+1);
-                    if (!silent) notifyItemMoved(in, in+1);
+                    /*if (!silent)*/ notifyItemMoved(in, in+1);
                 }
             }
         }
