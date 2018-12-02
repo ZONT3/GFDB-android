@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -284,7 +285,7 @@ public class CardActivity extends AppCompatActivity {
             TextView roles = wr.get().findViewById(R.id.card_role);
             TextView affects = wr.get().findViewById(R.id.card_affects);
             TextView buffs = wr.get().findViewById(R.id.card_buffs);
-            TextView skills = wr.get().findViewById(R.id.card_skills);
+            WebView skills = wr.get().findViewById(R.id.card_skills);
             TextView description = wr.get().findViewById(R.id.card_desc);
             final ProgressBar cgPb = wr.get().findViewById(R.id.card_cgpb);
 
@@ -311,7 +312,7 @@ public class CardActivity extends AppCompatActivity {
             roles.setText(tDoll.getRole());
             affects.setText("Affects "+tDoll.getAffect().toUpperCase());
             buffs.setText(Html.fromHtml(tDoll.getBuffs()));
-            skills.setText(Html.fromHtml(tDoll.getSkills()));
+            skills.loadDataWithBaseURL("", tDoll.getSkills(), "text/html", "UTF-8", "");
             description.setText(tDoll.getDescription());
 
             RecyclerView rw = wr.get().findViewById(R.id.card_recycler);

@@ -260,10 +260,25 @@ public class NetParser {
                         doll.affect = root.getElementsByClass("adj-effects").first().text().replace("Affects ", "");
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Affect", pe)); doll.affect = ""; }
                     try {
-                        doll.buffs = root.getElementsByClass("adj-bonus").first().getElementsByTag("table").first().toString();
+                        StringBuilder builder = new StringBuilder();
+                        Element table = root.getElementsByClass("adj-bonus").first().getElementsByTag("table").first();
+                        for (Element effect : table.getElementsByTag("tr")) {
+                            if (table.getElementsByTag("tr").indexOf(effect) > 0)
+                                builder.append("<br />");
+                            builder.append(String.format("<b>%s:</b> ", effect.getElementsByTag("th").first().text()));
+                            for (Element val : effect.getElementsByTag("td"))
+                                builder.append(effect.getElementsByTag("td").indexOf(val) > 0
+                                                ? ", " : "")
+                                        .append(val.text());
+                        }
+                        doll.buffs = builder.toString();
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Buffs", pe)); doll.buffs = ""; }
                     try {
-                        doll.skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling().toString();
+                        Element skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling();
+                        for (Element e : skills.getElementsByTag("img"))
+                            e.attr("src", "https://girlsfrontline.gamepress.gg"
+                                    + e.attr("src"));
+                        doll.skills = skills.toString();
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = ""; }
 
 //                    doll.hpBar = (int) Float.parseFloat(root.getElementsByAttributeValue("id", "hp-bar").first().attr("style")

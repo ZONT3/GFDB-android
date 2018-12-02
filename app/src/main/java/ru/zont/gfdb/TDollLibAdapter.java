@@ -55,6 +55,8 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     static final int SORT_ROF = 9;
 
     private static final ArrayList<String> TYPES_ORDER = gto();
+    private static final long PAUSE_BETWEEN_FILTER_CHANGES = 300;
+
     private static ArrayList<String> gto() {
         ArrayList<String> list = new ArrayList<>();
         list.add("HG");
@@ -72,9 +74,14 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     private View.OnClickListener listener;
     private TDolls dataset;
+    private WeakReference<ProgressBar> pb;
+    private WeakReference<TextView> nores;
     private final TDolls originalDataset;
     private int sort;
     private boolean reverse = false;
+
+    private long lastFiltersApply = 0;
+    private ApplierThread applier;
 
     static class VH extends RecyclerView.ViewHolder {
 
@@ -94,12 +101,16 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         }
     }
 
-    TDollLibAdapter(@NonNull RecyclerView parent, @NonNull View.OnClickListener listener, @NonNull TDolls list) {
+    TDollLibAdapter(@NonNull RecyclerView parent, @NonNull ProgressBar pb, @NonNull TextView nores,
+                    @NonNull View.OnClickListener listener, @NonNull TDolls list) {
         dataset = list;
         originalDataset = (TDolls) list.clone();
         sort = SORT_ID;
+        this.pb = new WeakReference<>(pb);
+        this.nores = new WeakReference<>(nores);
         this.parent = new WeakReference<>(parent);
         this.listener = listener;
+//        applier = new ApplierThread();
     }
 
     @NonNull
@@ -268,7 +279,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
             for (int in = 0; in < out; in++) {       //Внутренний цикл
                 if(comparator.compare(dataset.get(in), dataset.get(in+1)) > 0) {
                     Collections.swap(dataset, in, in+1);
-                    /*if (!silent)*/ notifyItemMoved(in, in+1);
+                    notifyItemMoved(in, in+1);
                 }
             }
         }
@@ -280,27 +291,94 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         sort();
     }
 
+    boolean isReverse() { return reverse; }
+
     void changeSort(int sort) {
         this.sort = sort;
-//        LinearLayoutManager lm = (LinearLayoutManager) parent.get().getLayoutManager();
-//        if (lm != null)
             notifyItemRangeChanged(0, getItemCount());
         sort();
     }
 
     int getSort() { return sort; }
 
-    private void resetList() {
+    void resetList() {
+        reverse = false;
         modifyDataset((TDolls) originalDataset.clone());
     }
 
+    private boolean canChangeFilters() {
+        return System.currentTimeMillis() - lastFiltersApply > PAUSE_BETWEEN_FILTER_CHANGES;
+    }
+
     void applySearchQuery(String query) {
+//        if (canChangeFilters()) {
+//            lastFiltersApply = System.currentTimeMillis();
+//            finallyApplySearchQuery(query);
+//        } else applier.search = query;
+        finallyApplySearchQuery(query);
+    }
+
+    void applyTimeFilter(int timeMins) {
+//        if (canChangeFilters()) {
+//            lastFiltersApply = System.currentTimeMillis();
+//            finallyApplyTimeFilter(timeMins);
+//        } else applier.time = timeMins;
+        finallyApplyTimeFilter(timeMins);
+    }
+
+    private void finallyApplySearchQuery(String query) {
         if (!query.equals("")) {
-            TDolls newList = (TDolls) originalDataset.clone();
-            for (TDoll doll : originalDataset)
+            TDolls newList = (TDolls) dataset.clone();
+            for (TDoll doll : dataset)
                 if (!doll.getName().toLowerCase().contains(query.toLowerCase()))
                     newList.remove(doll);
             modifyDataset(newList);
         } else resetList();
+        checkList();
     }
+
+    private void finallyApplyTimeFilter(int timeMins) {
+        if (timeMins > -1) {
+            TDolls newList = (TDolls) dataset.clone();
+            for (TDoll doll : dataset)
+                if (doll.getCraftMins() != timeMins)
+                    newList.remove(doll);
+            modifyDataset(newList);
+        } else resetList();
+        checkList();
+    }
+
+    boolean hasFilters() {
+        return !originalDataset.equals(dataset);
+    }
+
+    private void checkList() {
+        nores.get().setVisibility(dataset.size() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private class ApplierThread extends Thread {
+        String search;
+        int time = -1;
+
+        @Override
+        public void run() {
+            Thread.currentThread().setPriority(3);
+            while (!isInterrupted()) {
+                try {
+                    while (search == null && time < 0) Thread.sleep(10);
+                    while (!canChangeFilters()) Thread.sleep(10);
+
+                    if (search != null) finallyApplySearchQuery(search);
+                    if (time >= 0) finallyApplyTimeFilter(time);
+
+                    search = null;
+                    time = -1;
+                } catch (InterruptedException ignored) { }
+            }
+        }
+    }
+
+//    void onDestroy() {
+//        applier.interrupt();
+//    }
 }

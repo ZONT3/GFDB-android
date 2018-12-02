@@ -3,6 +3,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,15 +14,15 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max.ROF"
+                android:text="@string/card_maxrof"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_rof"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_rof"
                 app:layout_constraintTop_toBottomOf="@+id/card_rof" />
@@ -30,13 +31,13 @@
                 android:id="@+id/card_dmg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="322"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
                 app:layout_constraintBottom_toBottomOf="@+id/card_pb_dmg"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_dmg"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_dmg"
                 app:layout_constraintTop_toTopOf="@+id/card_pb_dmg"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.45"
+                tools:text="322" />
 
             <ProgressBar
                 android:id="@+id/card_pb_acc"
@@ -57,9 +58,9 @@
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max.ACC"
+                android:text="@string/card_maxacc"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_acc"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_acc"
                 app:layout_constraintTop_toBottomOf="@+id/card_acc" />
@@ -68,9 +69,9 @@
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max.EVA"
+                android:text="@string/card_maxeva"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_eva"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_eva"
                 app:layout_constraintTop_toBottomOf="@+id/card_eva" />
@@ -79,13 +80,13 @@
                 android:id="@+id/card_eva"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="14"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
                 app:layout_constraintBottom_toBottomOf="@+id/card_pb_eva"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_eva"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_eva"
                 app:layout_constraintTop_toTopOf="@+id/card_pb_eva"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.45"
+                tools:text="14" />
 
             <ProgressBar
                 android:id="@+id/card_pb_dmg"
@@ -106,9 +107,9 @@
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max.DMG"
+                android:text="@string/card_maxdmg"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/card_dmg"
                 app:layout_constraintStart_toStartOf="@+id/card_dmg"
                 app:layout_constraintTop_toBottomOf="@+id/card_dmg" />
@@ -120,32 +121,32 @@
                 android:layout_marginStart="64dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="64dp"
-                android:text="Unbuildable, Has MOD3"
                 android:textAlignment="center"
                 android:textAppearance="@android:style/TextAppearance.Material.Body2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_role" />
+                app:layout_constraintTop_toBottomOf="@+id/card_role"
+                tools:text="Unbuildable, Has MOD3" />
 
             <TextView
                 android:id="@+id/card_hp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="228"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
                 app:layout_constraintBottom_toBottomOf="@+id/card_pb_hp"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_hp"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_hp"
                 app:layout_constraintTop_toTopOf="@+id/card_pb_hp"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.45"
+                tools:text="228" />
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max.HP"
+                android:text="@string/card_maxhp"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/card_hp"
                 app:layout_constraintStart_toStartOf="@+id/card_hp"
                 app:layout_constraintTop_toBottomOf="@+id/card_hp" />
@@ -154,13 +155,13 @@
                 android:id="@+id/card_acc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1337"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
                 app:layout_constraintBottom_toBottomOf="@+id/card_pb_acc"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_acc"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_acc"
                 app:layout_constraintTop_toTopOf="@+id/card_pb_acc"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.45"
+                tools:text="1337" />
 
             <ProgressBar
                 android:id="@+id/card_pb_hp"
@@ -198,12 +199,12 @@
                 android:layout_marginStart="80dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="80dp"
-                android:text="Ultra Russsian DPS, Latvian UFO, Ukraine Salo, Belorussian Potato, Litvian Pizdauskas"
                 android:textAlignment="center"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_pb_acc" />
+                app:layout_constraintTop_toBottomOf="@+id/card_pb_acc"
+                tools:text="Ultra Russsian DPS, Latvian UFO, Ukraine Salo, Belorussian Potato, Litvian Pizdauskas" />
 
             <ProgressBar
                 android:id="@+id/card_pb_rof"
@@ -224,13 +225,13 @@
                 android:id="@+id/card_rof"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="88"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
                 app:layout_constraintBottom_toBottomOf="@+id/card_pb_rof"
                 app:layout_constraintEnd_toEndOf="@+id/card_pb_rof"
                 app:layout_constraintStart_toStartOf="@+id/card_pb_rof"
                 app:layout_constraintTop_toTopOf="@+id/card_pb_rof"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.45"
+                tools:text="88" />
 
             <LinearLayout
                 android:id="@+id/card_patt_lay"
@@ -352,11 +353,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
-                android:text="Affects AR"
                 android:textAlignment="viewStart"
                 android:textAppearance="@android:style/TextAppearance.Material.Body2"
                 app:layout_constraintStart_toEndOf="@+id/card_patt_lay"
-                app:layout_constraintTop_toBottomOf="@+id/card_build" />
+                app:layout_constraintTop_toBottomOf="@+id/card_build"
+                tools:text="Affects AR" />
 
             <TextView
                 android:id="@+id/card_buffs"
@@ -365,7 +366,6 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="32dp"
                 android:minHeight="70dp"
-                android:text="---------------------------------------------------------------------------------"
                 android:textAlignment="viewStart"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -378,18 +378,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
-                android:text="Skills"
+                android:text="@string/card_skills"
                 android:textAppearance="@android:style/TextAppearance.Material.Headline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_buffs" />
 
-            <TextView
+            <WebView
                 android:id="@+id/card_skills"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:text="----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
                 android:textAlignment="viewStart"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -403,11 +402,11 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
-                android:text="------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_skills" />
+                app:layout_constraintTop_toBottomOf="@+id/card_skills"
+                tools:text="------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" />
 
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>

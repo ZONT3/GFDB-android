@@ -9,20 +9,42 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
 
-    <item
-        android:id="@+id/lib_menu_sort"
-        android:icon="@drawable/baseline_sort_white_48"
-        android:title="@string/lib_menu_sort"
-        app:showAsAction="ifRoom">
-        <menu>
+    <group android:id="@+id/lib_menu_group_hos">
+        <item
+            android:id="@+id/lib_menu_sort"
+            android:icon="@drawable/baseline_sort_white_48"
+            android:title="@string/lib_menu_sort"
+            app:showAsAction="ifRoom">
+            <menu>
 
-            <item
-                android:id="@+id/lib_menu_sort_reverse"
-                android:checkable="true"
-                android:title="@string/lib_menu_sort_reverse"
-                app:showAsAction="never" />
-        </menu>
-    </item>
+                <item
+                    android:id="@+id/lib_menu_sort_reverse"
+                    android:checkable="true"
+                    android:title="@string/lib_menu_sort_reverse"
+                    app:showAsAction="never" />
+                <group
+                    android:id="@+id/lib_menu_group_sort"
+                    android:checkableBehavior="single" />
+            </menu>
+        </item>
+        <!--<item-->
+        <!--android:id="@+id/lib_menu_filter"-->
+        <!--android:icon="@drawable/baseline_filter_list_white_48"-->
+        <!--android:title="@string/lib_menu_filter"-->
+        <!--app:showAsAction="ifRoom" />-->
+        <item
+            android:id="@+id/lib_menu_fbt"
+            android:icon="@drawable/baseline_access_time_white_48"
+            android:title="@string/lib_menu_fbt"
+            app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/lib_menu_clear"
+            android:icon="@drawable/baseline_close_white_48"
+            android:title="@string/lib_menu_reset_filters"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+    </group>
+
 
 
 </menu>

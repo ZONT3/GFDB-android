@@ -26,6 +26,19 @@
     <string name="lib_menu_search">Search</string>
     <string name="lib_menu_sort">Sort</string>
     <string name="lib_menu_sort_reverse">Reverse</string>
+    <string name="main_cg">main cg</string>
+    <string name="card_maxhp">Max.HP</string>
+    <string name="card_maxdmg">Max.DMG</string>
+    <string name="card_maxacc">Max.ACC</string>
+    <string name="card_maxeva">Max.EVA</string>
+    <string name="card_maxrof">Max.ROF</string>
+    <string name="card_skills">Skills</string>
+    <string name="lib_menu_filter">Filter</string>
+    <string name="lib_menu_fbt">Find by Time...</string>
+    <string name="lib_nores">No results for such query</string>
+    <string name="time_title">Find by crafting time</string>
+    <string name="set">Set</string>
+    <string name="lib_menu_reset_filters">Reset Filters</string>
 
     <array name="card_links">
         <item>English version (gamepress.gg)</item>
