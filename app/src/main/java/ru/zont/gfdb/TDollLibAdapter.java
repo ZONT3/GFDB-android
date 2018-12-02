@@ -328,8 +328,8 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     private void finallyApplySearchQuery(String query) {
         if (!query.equals("")) {
-            TDolls newList = (TDolls) dataset.clone();
-            for (TDoll doll : dataset)
+            TDolls newList = (TDolls) originalDataset.clone();
+            for (TDoll doll : originalDataset)
                 if (!doll.getName().toLowerCase().contains(query.toLowerCase()))
                     newList.remove(doll);
             modifyDataset(newList);
@@ -339,8 +339,8 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     private void finallyApplyTimeFilter(int timeMins) {
         if (timeMins > -1) {
-            TDolls newList = (TDolls) dataset.clone();
-            for (TDoll doll : dataset)
+            TDolls newList = (TDolls) originalDataset.clone();
+            for (TDoll doll : originalDataset)
                 if (doll.getCraftMins() != timeMins)
                     newList.remove(doll);
             modifyDataset(newList);
@@ -349,7 +349,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     }
 
     boolean hasFilters() {
-        return !originalDataset.equals(dataset);
+        return originalDataset.size() != dataset.size();
     }
 
     private void checkList() {
