@@ -171,9 +171,9 @@ public class LibraryActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (adapter == null) return;
+//                                if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
+//                                    adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
                                 adapter.applyTimeFilter(hrs.getValue()*60 + mins.getValue());
-                                if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
-                                    adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
                                 invalidateOptionsMenu();
                             }
                         }).create().show();
