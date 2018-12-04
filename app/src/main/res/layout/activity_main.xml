@@ -38,4 +38,12 @@
         app:layout_constraintEnd_toEndOf="@+id/main_bt_lib"
         app:layout_constraintStart_toStartOf="@+id/main_bt_lib" />
 
+    <TextView
+        android:id="@+id/main_ver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
