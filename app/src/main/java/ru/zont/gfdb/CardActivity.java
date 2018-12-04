@@ -166,7 +166,7 @@ public class CardActivity extends AppCompatActivity {
             return LoadActivity.getCachedList(wr.get()).getById(args[0]);
         }
 
-        @SuppressLint("SetTextI18n")
+        @SuppressLint({"SetTextI18n", "DefaultLocale"})
         @Override
         protected void onPostExecute(TDoll tDoll) {
             CardActivity activity = wr.get();
@@ -195,13 +195,16 @@ public class CardActivity extends AppCompatActivity {
             assert toolbar != null;
 
             if (wr.get().getResources().getBoolean(R.bool.card_monotitle)) {
-                toolbar.setTitle(Html.fromHtml(String.format("[%s] %s <font color=\"#%06X\">%s</font>",
-                        tDoll.getClss(), tDoll.getName(),
+                toolbar.setTitle(Html.fromHtml(String.format("<font color=\"#%06X\">No.%d</font> %s <font color=\"#%06X\">%s</font> <font color=\"#%06X\">%s</font>",
+                        (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
+                        tDoll.getId(), tDoll.getName(),
+                        (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
+                        tDoll.getClss(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), RARITY_TABLE_COLOR[tDoll.getRarity()], null)),
                         RARITY_TABLE[tDoll.getRarity()])));
                 toolbar.setSubtitle("");
             } else {
-                toolbar.setTitle(tDoll.getName());
+                toolbar.setTitle("No."+tDoll.getId()+" "+tDoll.getName());
                 toolbar.setSubtitle(Html.fromHtml(String.format("%s <font color=\"#%06X\">%s</font>",
                         tDoll.getClss(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), RARITY_TABLE_COLOR[tDoll.getRarity()], null)),

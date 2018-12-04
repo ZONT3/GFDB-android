@@ -100,6 +100,7 @@ public class LibraryActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 finalMenu.setGroupVisible(R.id.lib_menu_group_hos, true);
+                invalidateOptionsMenu();
                 return true;
             }
         });
@@ -161,8 +162,10 @@ public class LibraryActivity extends AppCompatActivity {
                 final NumberPicker hrs = picker.findViewById(R.id.time_hrs);
                 final NumberPicker mins = picker.findViewById(R.id.time_mins);
                 NumberPicker secs = picker.findViewById(R.id.time_secs);
-                hrs.setMinValue(0); hrs.setMaxValue(8); hrs.setValue(1);
-                mins.setMinValue(0); mins.setMaxValue(59); mins.setValue(10);
+                hrs.setMinValue(0); hrs.setMaxValue(8);
+                hrs.setValue(adapter.getTimeFilter() > 0 ? adapter.getTimeFilter()/60 : 1);
+                mins.setMinValue(0); mins.setMaxValue(59);
+                mins.setValue(adapter.getTimeFilter() > 0 ? adapter.getTimeFilter()%60 : 10);
                 secs.setMinValue(0); secs.setMaxValue(59); secs.setValue(0); secs.setEnabled(false);
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.time_title)
@@ -171,9 +174,9 @@ public class LibraryActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (adapter == null) return;
-//                                if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
-//                                    adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
                                 adapter.applyTimeFilter(hrs.getValue()*60 + mins.getValue());
+                                if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
+                                    adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
                                 invalidateOptionsMenu();
                             }
                         }).create().show();

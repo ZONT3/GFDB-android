@@ -43,19 +43,32 @@ import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.core.TDolls;
 
 public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_ID = 0;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_NAME = 1;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_RARITY = 2;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_CONSTR = 3;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_TYPE = 4;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_HP = 5;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_DMG = 6;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_ACC = 7;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_EVA = 8;
+    @SuppressWarnings("WeakerAccess")
     static final int SORT_ROF = 9;
 
     private static final ArrayList<String> TYPES_ORDER = gto();
     private static final long PAUSE_BETWEEN_FILTER_CHANGES = 300;
+
+    private String searchQuery = "";
+    private int timeMins = -1;
 
     private static ArrayList<String> gto() {
         ArrayList<String> list = new ArrayList<>();
@@ -70,18 +83,15 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     private static final int[] RARITY_TABLE = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
                                                     R.color.rarity_epic, R.color.rarity_legend, R.color.rarity_extra};
 
-    private WeakReference<RecyclerView> parent;
+//    private WeakReference<RecyclerView> parent;
 
     private View.OnClickListener listener;
     private TDolls dataset;
-    private WeakReference<ProgressBar> pb;
+//    private WeakReference<ProgressBar> pb;
     private WeakReference<TextView> nores;
     private final TDolls originalDataset;
     private int sort;
     private boolean reverse = false;
-
-    private long lastFiltersApply = 0;
-    private ApplierThread applier;
 
     static class VH extends RecyclerView.ViewHolder {
 
@@ -106,11 +116,10 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         dataset = list;
         originalDataset = (TDolls) list.clone();
         sort = SORT_ID;
-        this.pb = new WeakReference<>(pb);
+//        this.pb = new WeakReference<>(pb);
         this.nores = new WeakReference<>(nores);
-        this.parent = new WeakReference<>(parent);
+//        this.parent = new WeakReference<>(parent);
         this.listener = listener;
-//        applier = new ApplierThread();
     }
 
     @NonNull
@@ -252,8 +261,8 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         sort();
     }
 
-//    private void sort() { sort(false); }
 
+//    private void sort() { sort(false); }
     private void sort(/*boolean silent*/) {
         Comparator<TDoll> comparator = new Comparator<TDoll>() {
             @Override
@@ -285,6 +294,21 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         }
     }
 
+    private void filter() {
+        TDolls newList = (TDolls) originalDataset.clone();
+
+        if (!searchQuery.equals("")) for (TDoll doll : originalDataset)
+            if (!doll.getName().toLowerCase().contains(searchQuery.toLowerCase()))
+                newList.remove(doll);
+
+        if (timeMins > -1) for (TDoll doll : originalDataset)
+            if (doll.getCraftMins() != timeMins)
+                newList.remove(doll);
+
+        modifyDataset(newList);
+        checkList();
+    }
+
     void setReverse(boolean reverse) {
         if (reverse == this.reverse) return;
         this.reverse = reverse;
@@ -306,47 +330,17 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         modifyDataset((TDolls) originalDataset.clone());
     }
 
-    private boolean canChangeFilters() {
-        return System.currentTimeMillis() - lastFiltersApply > PAUSE_BETWEEN_FILTER_CHANGES;
-    }
-
     void applySearchQuery(String query) {
-//        if (canChangeFilters()) {
-//            lastFiltersApply = System.currentTimeMillis();
-//            finallyApplySearchQuery(query);
-//        } else applier.search = query;
-        finallyApplySearchQuery(query);
+        searchQuery = query;
+        filter();
     }
 
     void applyTimeFilter(int timeMins) {
-//        if (canChangeFilters()) {
-//            lastFiltersApply = System.currentTimeMillis();
-//            finallyApplyTimeFilter(timeMins);
-//        } else applier.time = timeMins;
-        finallyApplyTimeFilter(timeMins);
+        this.timeMins = timeMins;
+        filter();
     }
 
-    private void finallyApplySearchQuery(String query) {
-        if (!query.equals("")) {
-            TDolls newList = (TDolls) originalDataset.clone();
-            for (TDoll doll : originalDataset)
-                if (!doll.getName().toLowerCase().contains(query.toLowerCase()))
-                    newList.remove(doll);
-            modifyDataset(newList);
-        } else resetList();
-        checkList();
-    }
-
-    private void finallyApplyTimeFilter(int timeMins) {
-        if (timeMins > -1) {
-            TDolls newList = (TDolls) originalDataset.clone();
-            for (TDoll doll : originalDataset)
-                if (doll.getCraftMins() != timeMins)
-                    newList.remove(doll);
-            modifyDataset(newList);
-        } else resetList();
-        checkList();
-    }
+    int getTimeFilter() { return timeMins; }
 
     boolean hasFilters() {
         return originalDataset.size() != dataset.size();
@@ -354,28 +348,6 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     private void checkList() {
         nores.get().setVisibility(dataset.size() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    private class ApplierThread extends Thread {
-        String search;
-        int time = -1;
-
-        @Override
-        public void run() {
-            Thread.currentThread().setPriority(3);
-            while (!isInterrupted()) {
-                try {
-                    while (search == null && time < 0) Thread.sleep(10);
-                    while (!canChangeFilters()) Thread.sleep(10);
-
-                    if (search != null) finallyApplySearchQuery(search);
-                    if (time >= 0) finallyApplyTimeFilter(time);
-
-                    search = null;
-                    time = -1;
-                } catch (InterruptedException ignored) { }
-            }
-        }
     }
 
 //    void onDestroy() {
