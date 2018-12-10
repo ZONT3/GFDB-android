@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.HashMap;
 

@@ -204,9 +204,9 @@ public class CardActivity extends AppCompatActivity {
                         RARITY_TABLE[tDoll.getRarity()])));
                 toolbar.setSubtitle("");
             } else {
-                toolbar.setTitle(String.format("<font color=\"#%06X\">No.%d</font> %s",
+                toolbar.setTitle(Html.fromHtml(String.format("<font color=\"#%06X\">No.%d</font> %s",
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
-                        tDoll.getId(), tDoll.getName()));
+                        tDoll.getId(), tDoll.getName())));
                 toolbar.setSubtitle(Html.fromHtml(String.format("%s <font color=\"#%06X\">%s</font>",
                         tDoll.getClss(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), RARITY_TABLE_COLOR[tDoll.getRarity()], null)),
