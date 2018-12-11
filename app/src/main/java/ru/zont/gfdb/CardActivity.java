@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -59,7 +60,8 @@ public class CardActivity extends AppCompatActivity {
 
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
-    private ProgressBar loadingPb;
+    private ViewGroup content;
+    private ViewGroup loadView;
 
     private TDoll doll;
 
@@ -76,7 +78,7 @@ public class CardActivity extends AppCompatActivity {
         if (!getResources().getBoolean(R.bool.card_tabless)) {
             ViewPager viewPager = findViewById(R.id.card_viewpager);
             viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
-                private Fragment[] fragments = new Fragment[]{new MainFragment(), new CGFragment()};
+                private Fragment[] fragments = new Fragment[]{new MainFragment().setWR(CardActivity.this), new CGFragment()};
 
                 @Override
                 public Fragment getItem(int position) {
@@ -102,17 +104,26 @@ public class CardActivity extends AppCompatActivity {
             finish();
         }
 
-        loadingPb = findViewById(R.id.card_pb);
-
         parser1 = new Lvl1Parser(this);
         parser1.execute(id);
     }
 
     public static class MainFragment extends Fragment {
+        private WeakReference<CardActivity> wr;
+        private MainFragment setWR(CardActivity activity) {
+            wr = new WeakReference<>(activity);
+            return this;
+        }
+
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_card_main, container, false);
+            View view = inflater.inflate(R.layout.fragment_card_main, container, false);
+            wr.get().content = view.findViewById(R.id.card_content);
+            wr.get().loadView = view.findViewById(R.id.card_load);
+            wr.get().content.setVisibility(View.INVISIBLE);
+            wr.get().loadView.setVisibility(View.VISIBLE);
+            return view;
         }
     }
 
@@ -122,18 +133,6 @@ public class CardActivity extends AppCompatActivity {
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             return inflater.inflate(R.layout.fragment_card_cgs, container, false);
         }
-    }
-
-    private void checkAsyncTasks() {
-        boolean p1;
-        boolean p2;
-
-        if (parser1==null) p1 = true;
-        else p1 = parser1.done;
-        if (parser2==null) p2 = true;
-        else p2 = parser2.done;
-
-        if (p1 && p2) loadingPb.setVisibility(View.GONE);
     }
 
     /*
@@ -155,7 +154,6 @@ public class CardActivity extends AppCompatActivity {
 
     private static class Lvl1Parser extends AsyncTask<Integer, Void, TDoll> {
         WeakReference<CardActivity> wr;
-        boolean done = false;
 
         Lvl1Parser(CardActivity activity) {
             wr = new WeakReference<>(activity);
@@ -226,7 +224,6 @@ public class CardActivity extends AppCompatActivity {
             pbEVA.setMax(100); pbEVA.setProgress(tDoll.getEvaBar());
             pbROF.setMax(100); pbROF.setProgress(tDoll.getRofBar());
 
-            done = true;
             wr.get().parser2 = new Lvl2Parser(wr);
             wr.get().parser2.execute(tDoll);
         }
@@ -234,7 +231,6 @@ public class CardActivity extends AppCompatActivity {
 
     private static class Lvl2Parser extends AsyncTask<TDoll, Void, TDoll> {
         WeakReference<CardActivity> wr;
-        boolean done = false;
         ArrayList<NetParser.ParserException> exceptions;
 
         Lvl2Parser(WeakReference<CardActivity> wr) { this.wr = wr; }
@@ -346,8 +342,10 @@ public class CardActivity extends AppCompatActivity {
                 }
             }
 
-            done = true;
-            wr.get().checkAsyncTasks();
+            CardActivity cardActivity = wr.get();
+            cardActivity.content.startAnimation(AnimationUtils.loadAnimation(cardActivity, R.anim.fadein));
+            cardActivity.loadView.setVisibility(View.GONE);
+            cardActivity.content.setVisibility(View.VISIBLE);
         }
 
         private static class CgAdapter extends RecyclerView.Adapter<CgAdapter.VH> {
