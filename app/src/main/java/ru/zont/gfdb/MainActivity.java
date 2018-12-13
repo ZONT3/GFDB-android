@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
             new Thread(() -> {
                 try {
                     File dateFile = new File(getCacheDir(), "lastupd");
+                    dateFile.delete();
                     ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(dateFile));
                     Date date = Calendar.getInstance().getTime();
                     date.setTime(System.currentTimeMillis());

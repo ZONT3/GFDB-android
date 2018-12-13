@@ -2,6 +2,7 @@ package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -46,28 +47,29 @@ public class LoadActivity extends AppCompatActivity {
         date.setTime(System.currentTimeMillis());
         File dateFile = new File(getCacheDir(), "lastupd");
         boolean upd = false;
-        if (!dateFile.exists()) {
-            new LoadList(this).execute();
-            upd = true;
-        } else {
+        if (!dateFile.exists()) upd = true;
+        else {
             try {
                 FileInputStream fis = new FileInputStream(dateFile);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 Date prevDate = (Date) ois.readObject();
                 ois.close();
-                if (date.getTime() - prevDate.getTime() > 24L * 60L * 60L * 1000L) {
-                    new LoadList(this).execute();
-                    upd = true;
-                }
+                if (date.getTime() - prevDate.getTime() > 24L * 60L * 60L * 1000L) upd = true;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
+
+        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.sys", MODE_PRIVATE);
+        if (shPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE)
+            upd = true;
+        shPrefs.edit().putInt("lastStartVer", BuildConfig.VERSION_CODE).apply();
+
         if (!upd) {
             startActivity(new Intent(this, MainActivity.class)
                     .putExtra("upd", false));
             finish();
-        }
+        } else new LoadList(this).execute();
     }
 
     private static class LoadList extends AsyncTask<Void, Integer, Void> {

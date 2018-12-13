@@ -40,6 +40,7 @@
     <string name="set">Set</string>
     <string name="lib_menu_reset_filters">Reset Filters</string>
     <string name="card_downloading">Downloading data…</string>
+    <string name="load_outdate">Reloading DB due to app update</string>
 
     <array name="card_links">
         <item>English version (gamepress.gg)</item>
