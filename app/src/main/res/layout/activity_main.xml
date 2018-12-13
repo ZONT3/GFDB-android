@@ -43,8 +43,10 @@
         android:id="@+id/main_ver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
         android:textAppearance="@android:style/TextAppearance.Material.Small"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="v.2.2.8" />
 
 </android.support.constraint.ConstraintLayout>

@@ -96,6 +96,11 @@ public class CardActivity extends AppCompatActivity {
                     return new String[]{getString(R.string.card_info), getString(R.string.card_cgs)}[position];
                 }
             });
+        } else {
+            content = findViewById(R.id.card_content);
+            loadView = findViewById(R.id.card_load);
+            content.setVisibility(View.INVISIBLE);
+            loadView.setVisibility(View.VISIBLE);
         }
 
         int id = getIntent().getIntExtra("id", -1);

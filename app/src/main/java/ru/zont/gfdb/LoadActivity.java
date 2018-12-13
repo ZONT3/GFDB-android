@@ -63,16 +63,9 @@ public class LoadActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        if (upd) {
-            try {
-                FileOutputStream fos = new FileOutputStream(dateFile);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-                oos.writeObject(date);
-                oos.flush();
-                oos.close();
-            } catch (IOException e) { e.printStackTrace(); }
-        } else {
-            startActivity(new Intent(this, MainActivity.class));
+        if (!upd) {
+            startActivity(new Intent(this, MainActivity.class)
+                    .putExtra("upd", false));
             finish();
         }
     }
@@ -103,7 +96,10 @@ public class LoadActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             LoadActivity activity = contextReference.get();
-            if (activity == null || activity.isFinishing()) return;
+            if (activity == null || activity.isFinishing()) {
+                cancel(true);
+                return;
+            }
 
             if (finished) activity.startActivity(new Intent(activity, MainActivity.class));
             activity.finish();
@@ -113,7 +109,10 @@ public class LoadActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             LoadActivity activity = contextReference.get();
-            if (activity == null || activity.isFinishing()) return;
+            if (activity == null || activity.isFinishing()) {
+                cancel(true);
+                return;
+            }
             ProgressBar progressBar = activity.findViewById(R.id.load_pb);
             TextView textView = activity.findViewById(R.id.load_text);
             TextView ex = activity.findViewById(R.id.load_ex);

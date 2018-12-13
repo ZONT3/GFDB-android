@@ -11,6 +11,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +30,22 @@ public class MainActivity extends AppCompatActivity {
 
         TextView ver = findViewById(R.id.main_ver);
         ver.setText("v." + BuildConfig.VERSION_NAME);
+
+        if (getIntent().getBooleanExtra("upd", true)) {
+            new Thread(() -> {
+                try {
+                    File dateFile = new File(getCacheDir(), "lastupd");
+                    ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(dateFile));
+                    Date date = Calendar.getInstance().getTime();
+                    date.setTime(System.currentTimeMillis());
+                    os.writeObject(date);
+                    os.flush();
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
     }
 
     @Override
