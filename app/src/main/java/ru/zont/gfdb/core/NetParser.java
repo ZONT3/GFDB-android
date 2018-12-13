@@ -58,7 +58,7 @@ public class NetParser {
         jsonFile = new File(context.getCacheDir(), "doc.json");
         statFile = new File(context.getCacheDir(), "stats.json");
         gftwFile = new File(context.getCacheDir(), "gftw.html");
-        gftwFile = new File(context.getCacheDir(), "wiki.html");
+        wikiFile = new File(context.getCacheDir(), "wiki.html");
         if (!jsonFile.exists()) jsonFile = null;
         if (!gftwFile.exists()) gftwFile = null;
         if (!statFile.exists()) statFile = null;
@@ -152,7 +152,7 @@ public class NetParser {
                 list = new Gson().fromJson(new JsonReader(new FileReader(jsonFile)), type);
                 stats = new Gson().fromJson(new JsonReader(new FileReader(statFile)), type);
                 gftw = Jsoup.parse(gftwFile, "UTF-8").body();
-                wiki = Jsoup.parse(wikiFile, "UTF-8").body();
+//                wiki = Jsoup.parse(wikiFile, "UTF-8").body();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -198,12 +198,12 @@ public class NetParser {
                         doll.evaBar = 0; doll.rofBar = 0;
                     }
 
-                    for (Element e : wiki.getElementsByAttributeValue("data-server-released", gameServer)) {
-                        try {
-                            if (e.attr("data-server-releasename").equals(doll.name))
-                                doll.wiki = new URL("https://en.gfwiki.com/wiki/" + e.attr("data-server-doll"));
-                        } catch (Exception ignored) {}
-                    }
+//                    for (Element e : wiki.getElementsByAttributeValue("data-server-released", gameServer)) {
+//                        try {
+//                            if (e.attr("data-server-releasename").equals(doll.name))
+//                                doll.wiki = new URL("https://en.gfwiki.com/wiki/" + e.attr("data-server-doll"));
+//                        } catch (Exception ignored) {}
+//                    }
                     if (gftwentry != null) doll.gffwstw = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
 
                     doll.parsingLevel = 1;
