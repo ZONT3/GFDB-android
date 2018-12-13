@@ -1,53 +1,54 @@
 package ru.zont.gfdb.core;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 
-@SuppressWarnings("WeakerAccess")
 public class TDoll implements Serializable {
-    protected int parsingLevel = 0;
-    protected int id;
+    int parsingLevel = 0;
+    int id;
 
-    protected String name;
-    protected int rarity;
-    protected String clss;
-    protected String craft;
+    String name;
+    int rarity;
+    String type;
+    String craft;
 
-    protected int hp;
-    protected int dmg;
-    protected int acc;
-    protected int eva;
-    protected int rof;
+    int hp;
+    int dmg;
+    int acc;
+    int eva;
+    int rof;
     
-    protected int hpBar;
-    protected int dmgBar;
-    protected int accBar;
-    protected int evaBar;
-    protected int rofBar;
+    int hpBar;
+    int dmgBar;
+    int accBar;
+    int evaBar;
+    int rofBar;
 
-    protected URL thumb;
-    protected URL lvl2;
-    protected URL lvl2fws;
+    URL thumb;
+    URL gamepress;
+    URL gffwstw;
+    URL wiki;
 
     // ---------------------- LEVEL 2 PARSING
-    protected URL cgMain;
-    protected URL cgDamage;
-    protected URL cgMainHQ;
-    protected URL cgDamageHQ;
-    protected ArrayList<String> costitles;
-    protected ArrayList<URL[]> costumes;
+    URL cgMain;
+    URL cgDamage;
+    URL cgMainHQ;
+    URL cgDamageHQ;
+    ArrayList<String> costitles;
+    ArrayList<URL[]> costumes;
 
-    protected String role;
-    protected String description;
-    protected int[][] pattern;
-    protected String affect;
-    protected String buffs;
-    protected String skills;
+    String role;
+    String description;
+    int[][] pattern;
+    String affect;
+    String buffs;
+    String skills;
 
-    public TDoll(int id) { this.id = id; }
+    TDoll(int id) { this.id = id; }
 
     public int getId() { return id; }
 
@@ -55,7 +56,7 @@ public class TDoll implements Serializable {
 
     public int getRarity() { return rarity; }
 
-    public String getClss() { return clss; }
+    public String getType() { return type; }
 
     public String getCraft() { return craft; }
 
@@ -111,9 +112,11 @@ public class TDoll implements Serializable {
 
     public String getBuffs() { return buffs; }
 
-    public URL getLvl2() { return lvl2; }
+    public URL getGamepress() { return gamepress; }
 
-    public URL getLvl2fws() { return lvl2fws; }
+    public URL getGffwstw() { return gffwstw; }
+    
+    public URL getWiki() { return wiki; }
 
     @Override
     public boolean equals(Object obj) {
@@ -121,6 +124,7 @@ public class TDoll implements Serializable {
         return super.equals(obj);
     }
 
+    @NonNull
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {

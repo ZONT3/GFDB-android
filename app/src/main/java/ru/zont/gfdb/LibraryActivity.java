@@ -1,7 +1,6 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,10 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
@@ -30,6 +27,8 @@ import ru.zont.gfdb.core.TDolls;
 public class LibraryActivity extends AppCompatActivity {
     private static TDollLibAdapter adapter;
     private Toolbar toolbar;
+    private ProgressBar pb;
+    private boolean inited = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +39,8 @@ public class LibraryActivity extends AppCompatActivity {
         assert getSupportActionBar()!=null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        pb = findViewById(R.id.lib_pb);
 
         new AdapterLinker(this).execute();
     }
@@ -54,8 +55,8 @@ public class LibraryActivity extends AppCompatActivity {
             final RecyclerView recyclerView = wr.get().findViewById(R.id.lib_list);
             int spans = Dimension.toDp(wr.get().getResources().getDisplayMetrics().widthPixels, wr.get()) / 88;
             recyclerView.setLayoutManager(new GridLayoutManager(wr.get(), spans));
-            adapter = new TDollLibAdapter(recyclerView, (ProgressBar) wr.get().findViewById(R.id.lib_pb),
-                    (TextView) wr.get().findViewById(R.id.lib_nores), v -> {
+            adapter = new TDollLibAdapter(recyclerView, wr.get().pb,
+                    wr.get().findViewById(R.id.lib_nores), v -> {
                         int itemPosition = recyclerView.getChildLayoutPosition(v);
                         TDollLibAdapter adapter = (TDollLibAdapter) recyclerView.getAdapter();
                         if (adapter == null) return;
@@ -65,10 +66,12 @@ public class LibraryActivity extends AppCompatActivity {
                         wr.get().startActivity(intent);
                     }, tdolls);
             recyclerView.setAdapter(adapter);
-            wr.get().toolbar.setOnClickListener(v -> recyclerView.scrollToPosition(0));
 
-            wr.get().invalidateOptionsMenu();
-            wr.get().findViewById(R.id.lib_pb).setVisibility(View.GONE);
+            LibraryActivity libraryActivity = wr.get();
+            libraryActivity.toolbar.setOnClickListener(v -> recyclerView.scrollToPosition(0));
+            libraryActivity.findViewById(R.id.lib_pb).setVisibility(View.GONE);
+            libraryActivity.inited = true;
+            libraryActivity.invalidateOptionsMenu();
         }
 
         @Override
@@ -79,6 +82,8 @@ public class LibraryActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (!inited) return super.onCreateOptionsMenu(menu);
+        
         getMenuInflater().inflate(R.menu.library, menu);
         MenuItem searchItem = menu.findItem(R.id.lib_menu_search);
         final Menu finalMenu = menu;
@@ -140,7 +145,7 @@ public class LibraryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.lib_menu_search:
-                TransitionManager.beginDelayedTransition((ViewGroup)findViewById(R.id.lib_tb));
+                TransitionManager.beginDelayedTransition(findViewById(R.id.lib_tb));
                 item.expandActionView();
                 return true;
             case R.id.lib_menu_sort_reverse:

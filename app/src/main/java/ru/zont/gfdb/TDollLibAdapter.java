@@ -176,7 +176,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                     statval, statStr)));
         }
 
-        holder.mType.setText(doll.getClss());
+        holder.mType.setText(doll.getType());
         holder.mTitle.setText(doll.getName());
 
         holder.mPB.setVisibility(View.VISIBLE);
@@ -265,7 +265,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                 case SORT_NAME: return  (reverse ? -1 : 1) * (o1.getName().compareTo(o2.getName()));
                 case SORT_CONSTR: return (reverse ? -1 : 1) * (o1.getCraftMins() - o2.getCraftMins());
                 case SORT_RARITY: return (reverse ? -1 : 1) * (o2.getRarity() - o1.getRarity());
-                case SORT_TYPE: return (reverse ? -1 : 1) * (TYPES_ORDER.indexOf(o1.getClss().toUpperCase()) - TYPES_ORDER.indexOf(o2.getClss().toUpperCase()));
+                case SORT_TYPE: return (reverse ? -1 : 1) * (TYPES_ORDER.indexOf(o1.getType().toUpperCase()) - TYPES_ORDER.indexOf(o2.getType().toUpperCase()));
 
                 case SORT_HP: return (reverse ? -1 : 1) * (o2.getHp() - o1.getHp());
                 case SORT_DMG: return (reverse ? -1 : 1) * (o2.getDmg() - o1.getDmg());

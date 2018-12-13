@@ -11,7 +11,7 @@
     <string name="load_preparing">Preparing…</string>
     <string name="load_tdl">T-Doll list</string>
     <string name="load_tnl">Thumbnail URLs</string>
-    <string name="load_aux">Debug doc</string>
+    <string name="load_aux">Wiki doll list</string>
     <string name="card_info">Information</string>
     <string name="card_cgs">CGs</string>
     <string name="card_menu_link">Links</string>

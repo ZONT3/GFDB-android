@@ -12,11 +12,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -25,31 +23,50 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
+/*
+* Здесь пизда быдлокод, я знаю.
+* ZONT_
+*
+* TODO СОЗДАТЬ НОВЫЙ КЛАСС, ОСНОВЫВАЯСЬ НА ЭТОМ
+* */
+
+@Deprecated
 public class NetParser {
     public static final int TDLIST = 0;
     public static final int TNLIST = 1;
     public static final int STATLIST = 2;
-    public static final int AUX = 3;
+    public static final int WIKI = 3;
 
     private File jsonFile;
     private File statFile;
     private File gftwFile;
+    private File wikiFile;
 
     private ArrayList<HashMap<String, String>> list;
     private ArrayList<HashMap<String, String>> stats;
     private Element gftw;
+    private Element wiki;
 
-    public NetParser(Context context, int obj) throws IOException {
-        if (obj < 0) {
-            jsonFile = new File(context.getCacheDir(), "doc.json");
-            statFile = new File(context.getCacheDir(), "stats.json");
-            gftwFile = new File(context.getCacheDir(), "gftw.html");
-            if (!jsonFile.exists()) jsonFile = null;
-            if (!gftwFile.exists()) gftwFile = null;
-            if (!statFile.exists()) statFile = null;
-            return;
-        }
+    private String gameServer;
+
+    private NetParser(String gameServer) {
+        this.gameServer = gameServer;
+    }
+
+    public NetParser(Context context, String gameServer) {
+        this(gameServer);
+        jsonFile = new File(context.getCacheDir(), "doc.json");
+        statFile = new File(context.getCacheDir(), "stats.json");
+        gftwFile = new File(context.getCacheDir(), "gftw.html");
+        gftwFile = new File(context.getCacheDir(), "wiki.html");
+        if (!jsonFile.exists()) jsonFile = null;
+        if (!gftwFile.exists()) gftwFile = null;
+        if (!statFile.exists()) statFile = null;
+        if (!wikiFile.exists()) wikiFile = null;
+    }
+
+    public NetParser(Context context, int obj, String gameServer) throws IOException {
+        this(gameServer);
         prepare(context, obj);
     }
 
@@ -73,8 +90,17 @@ public class NetParser {
             case STATLIST:
                 statFile = getJson("https://gamepress.gg/sites/default/files/aggregatedjson/GFLStatRankings.json", "stats.json", context);
                 break;
-            case AUX: // debuggable document
-                new BufferedWriter(new FileWriter(new File(context.getCacheDir(), "416.html"))).write(Jsoup.connect("https://girlsfrontline.gamepress.gg/t-doll/hk416").get().toString());
+            case WIKI: // debuggable document
+                File wiki = new File(context.getFilesDir(), "wiki.html");
+                if (wiki.exists()) wiki.delete();
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://en.gfwiki.com/wiki/T-Doll_Index").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(wiki)) {
+                    byte dataBuffer[] = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1)
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                } catch (IOException e) { e.printStackTrace(); }
+                wikiFile = wiki;
                 break;
         }
     }
@@ -126,6 +152,7 @@ public class NetParser {
                 list = new Gson().fromJson(new JsonReader(new FileReader(jsonFile)), type);
                 stats = new Gson().fromJson(new JsonReader(new FileReader(statFile)), type);
                 gftw = Jsoup.parse(gftwFile, "UTF-8").body();
+                wiki = Jsoup.parse(wikiFile, "UTF-8").body();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -151,9 +178,8 @@ public class NetParser {
                             .first().attr("style").replaceAll("background-image: url\\(", "").replaceAll("\\);", ""));
                     else doll.thumb = new URL("https://gamepress.gg" + entry.get("icon").replaceAll("\\\\", ""));
                     doll.name = entry.get("title");
-                    doll.lvl2 = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
-                    if (gftwentry != null) doll.lvl2fws = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
-                    doll.clss = entry.get("tdoll_class");
+                    doll.gamepress = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
+                    doll.type = entry.get("tdoll_class");
                     doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", "").replace("ex", "6"));
                     doll.craft = entry.get("field_t_doll_craft_time"); if (doll.craft.isEmpty()) doll.craft = "Unbuildable";
                     doll.acc = Integer.parseInt(entry.get("acc"));
@@ -168,19 +194,25 @@ public class NetParser {
                         doll.evaBar = (int) ((float) doll.eva / (float) getHighest("eva", stats) * 100);
                         doll.rofBar = (int) ((float) doll.rof / (float) getHighest("rof", stats) * 100);
                     } catch (Exception pe) { exceptions.add(new ParserException(doll, "Bars", pe));
-                        doll.hpBar = 0;
-                        doll.dmgBar = 0;
-                        doll.accBar = 0;
-                        doll.evaBar = 0;
-                        doll.rofBar = 0;
+                        doll.hpBar = 0; doll.dmgBar = 0; doll.accBar = 0;
+                        doll.evaBar = 0; doll.rofBar = 0;
                     }
+
+                    for (Element e : wiki.getElementsByAttributeValue("data-server-released", gameServer)) {
+                        try {
+                            if (e.attr("data-server-releasename").equals(doll.name))
+                                doll.wiki = new URL("https://en.gfwiki.com/wiki/" + e.attr("data-server-doll"));
+                        } catch (Exception ignored) {}
+                    }
+                    if (gftwentry != null) doll.gffwstw = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
+
                     doll.parsingLevel = 1;
                 }
                 if (level > 1 && doll.parsingLevel <= 1) {
-                    Element root = Jsoup.connect(doll.lvl2.toString()).get().body();
+                    Element root = Jsoup.connect(doll.gamepress.toString()).get().body();
                     Element gftwRoot = null;
                     if (gftwentry != null)
-                        gftwRoot = Jsoup.connect(doll.lvl2fws.toString()).get().body();
+                        gftwRoot = Jsoup.connect(doll.gffwstw.toString()).get().body();
 
                     try {
                         doll.cgMain = new URL("http://gamepress.gg"

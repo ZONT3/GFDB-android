@@ -30,6 +30,8 @@ import ru.zont.gfdb.core.TDolls;
 
 public class LoadActivity extends AppCompatActivity {
 
+    private String gameServer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -42,6 +44,9 @@ public class LoadActivity extends AppCompatActivity {
                         dm.density, dm.widthPixels, dm.heightPixels,
                         Dimension.toDp(dm.widthPixels, this), Dimension.toDp(dm.heightPixels, this),
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
+
+        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE);
+        gameServer = shPrefs.getString("server", "EN");
 
         Date date = Calendar.getInstance().getTime();
         date.setTime(System.currentTimeMillis());
@@ -60,16 +65,19 @@ public class LoadActivity extends AppCompatActivity {
             }
         }
 
-        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.sys", MODE_PRIVATE);
-        if (shPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE)
+        SharedPreferences sysPrefs = getSharedPreferences("ru.zont.gfdb.sys", MODE_PRIVATE);
+        if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE)
             upd = true;
-        shPrefs.edit().putInt("lastStartVer", BuildConfig.VERSION_CODE).apply();
+        sysPrefs.edit().putInt("lastStartVer", BuildConfig.VERSION_CODE).apply();
 
         if (!upd) {
             startActivity(new Intent(this, MainActivity.class)
                     .putExtra("upd", false));
             finish();
-        } else new LoadList(this).execute();
+        } else {
+            dateFile.delete();
+            new LoadList(this).execute();
+        }
     }
 
     private static class LoadList extends AsyncTask<Void, Integer, Void> {
@@ -130,7 +138,7 @@ public class LoadActivity extends AppCompatActivity {
                     if (progressBar.getMax() != arg2) progressBar.setMax(arg2);
                     progressBar.setProgress(arg1);
                     textView.setText(R.string.load_dl);
-                    ex.setText(new int[] {R.string.load_tdl, R.string.load_tnl, R.string.load_stat}[arg3]);
+                    ex.setText(new int[] {R.string.load_tdl, R.string.load_tnl, R.string.load_stat, R.string.load_aux}[arg3]);
                     break;
                 case CODE_PARSING:
                     if (progressBar.isIndeterminate()) progressBar.setIndeterminate(false);
@@ -153,14 +161,15 @@ public class LoadActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             NetParser parser;
             try {
-                publishProgress(CODE_DL, 0, 3, NetParser.TDLIST);
-                parser = new NetParser(contextReference.get(), NetParser.TDLIST);
-                publishProgress(CODE_DL, 1, 3, NetParser.TNLIST);
+                publishProgress(CODE_DL, 0, 4, NetParser.TDLIST);
+                parser = new NetParser(contextReference.get(), NetParser.TDLIST,
+                        contextReference.get().gameServer);
+                publishProgress(CODE_DL, 1, 4, NetParser.TNLIST);
                 parser.prepare(contextReference.get(), NetParser.TNLIST);
-                publishProgress(CODE_DL, 2, 3, NetParser.STATLIST);
+                publishProgress(CODE_DL, 2, 4, NetParser.STATLIST);
                 parser.prepare(contextReference.get(), NetParser.STATLIST);
-//                publishProgress(CODE_DL, 3, 4, NetParser.AUX);
-//                parser.prepare(contextReference.get(), NetParser.AUX);
+                publishProgress(CODE_DL, 3, 4, NetParser.WIKI);
+                parser.prepare(contextReference.get(), NetParser.WIKI);
             }
             catch (IOException e) { e.printStackTrace(); return null; }
 

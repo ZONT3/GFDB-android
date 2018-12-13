@@ -1,7 +1,6 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -202,7 +201,7 @@ public class CardActivity extends AppCompatActivity {
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
                         tDoll.getId(), tDoll.getName(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
-                        tDoll.getClss(),
+                        tDoll.getType(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), RARITY_TABLE_COLOR[tDoll.getRarity()], null)),
                         RARITY_TABLE[tDoll.getRarity()])));
                 toolbar.setSubtitle("");
@@ -211,7 +210,7 @@ public class CardActivity extends AppCompatActivity {
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), android.R.color.darker_gray, null)),
                         tDoll.getId(), tDoll.getName())));
                 toolbar.setSubtitle(Html.fromHtml(String.format("%s <font color=\"#%06X\">%s</font>",
-                        tDoll.getClss(),
+                        tDoll.getType(),
                         (0xFFFFFF & ResourcesCompat.getColor(wr.get().getResources(), RARITY_TABLE_COLOR[tDoll.getRarity()], null)),
                         RARITY_TABLE[tDoll.getRarity()])));
             }
@@ -242,11 +241,9 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(TDoll... tDolls) {
-            try {
-                NetParser parser = new NetParser(wr.get(), -1);
-                exceptions = parser.parseDoll(tDolls[0], 2);
-                if (exceptions == null) return null;
-            } catch (IOException e) { e.printStackTrace(); return null; }
+            NetParser parser = new NetParser(wr.get(), "EN");
+            exceptions = parser.parseDoll(tDolls[0], 2);
+            if (exceptions == null) return null;
             return tDolls[0];
         }
 
@@ -449,8 +446,8 @@ public class CardActivity extends AppCompatActivity {
                         .setTitle(R.string.card_menu_link)
                         .setItems(R.array.card_links, (dialog, which) -> {
                             switch (which) {
-                                case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2().toString()))); break;
-                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2fws().toString()))); break;
+                                case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGamepress().toString()))); break;
+                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGffwstw().toString()))); break;
                             }
                         }).create().show();
                 return true;
