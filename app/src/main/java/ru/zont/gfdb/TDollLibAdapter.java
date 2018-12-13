@@ -1,7 +1,6 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -9,15 +8,11 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -264,23 +259,20 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
 //    private void sort() { sort(false); }
     private void sort(/*boolean silent*/) {
-        Comparator<TDoll> comparator = new Comparator<TDoll>() {
-            @Override
-            public int compare(TDoll o1, TDoll o2) {
-                switch (sort) {
-                    case SORT_ID: return (reverse ? -1 : 1) * (o1.getId() - o2.getId());
-                    case SORT_NAME: return  (reverse ? -1 : 1) * (o1.getName().compareTo(o2.getName()));
-                    case SORT_CONSTR: return (reverse ? -1 : 1) * (o1.getCraftMins() - o2.getCraftMins());
-                    case SORT_RARITY: return (reverse ? -1 : 1) * (o2.getRarity() - o1.getRarity());
-                    case SORT_TYPE: return (reverse ? -1 : 1) * (TYPES_ORDER.indexOf(o1.getClss().toUpperCase()) - TYPES_ORDER.indexOf(o2.getClss().toUpperCase()));
+        Comparator<TDoll> comparator = (o1, o2) -> {
+            switch (sort) {
+                case SORT_ID: return (reverse ? -1 : 1) * (o1.getId() - o2.getId());
+                case SORT_NAME: return  (reverse ? -1 : 1) * (o1.getName().compareTo(o2.getName()));
+                case SORT_CONSTR: return (reverse ? -1 : 1) * (o1.getCraftMins() - o2.getCraftMins());
+                case SORT_RARITY: return (reverse ? -1 : 1) * (o2.getRarity() - o1.getRarity());
+                case SORT_TYPE: return (reverse ? -1 : 1) * (TYPES_ORDER.indexOf(o1.getClss().toUpperCase()) - TYPES_ORDER.indexOf(o2.getClss().toUpperCase()));
 
-                    case SORT_HP: return (reverse ? -1 : 1) * (o2.getHp() - o1.getHp());
-                    case SORT_DMG: return (reverse ? -1 : 1) * (o2.getDmg() - o1.getDmg());
-                    case SORT_ACC: return (reverse ? -1 : 1) * (o2.getAcc() - o1.getAcc());
-                    case SORT_EVA: return (reverse ? -1 : 1) * (o2.getEva() - o1.getEva());
-                    case SORT_ROF: return (reverse ? -1 : 1) * (o2.getRof() - o1.getRof());
-                    default: return 0;
-                }
+                case SORT_HP: return (reverse ? -1 : 1) * (o2.getHp() - o1.getHp());
+                case SORT_DMG: return (reverse ? -1 : 1) * (o2.getDmg() - o1.getDmg());
+                case SORT_ACC: return (reverse ? -1 : 1) * (o2.getAcc() - o1.getAcc());
+                case SORT_EVA: return (reverse ? -1 : 1) * (o2.getEva() - o1.getEva());
+                case SORT_ROF: return (reverse ? -1 : 1) * (o2.getRof() - o1.getRof());
+                default: return 0;
             }
         };
 

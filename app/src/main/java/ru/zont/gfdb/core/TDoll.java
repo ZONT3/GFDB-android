@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @SuppressWarnings("WeakerAccess")
 public class TDoll implements Serializable {

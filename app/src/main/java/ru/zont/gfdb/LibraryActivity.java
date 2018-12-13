@@ -55,25 +55,17 @@ public class LibraryActivity extends AppCompatActivity {
             int spans = Dimension.toDp(wr.get().getResources().getDisplayMetrics().widthPixels, wr.get()) / 88;
             recyclerView.setLayoutManager(new GridLayoutManager(wr.get(), spans));
             adapter = new TDollLibAdapter(recyclerView, (ProgressBar) wr.get().findViewById(R.id.lib_pb),
-                    (TextView) wr.get().findViewById(R.id.lib_nores), new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int itemPosition = recyclerView.getChildLayoutPosition(v);
-                    TDollLibAdapter adapter = (TDollLibAdapter) recyclerView.getAdapter();
-                    if (adapter == null) return;
-                    TDoll tDoll = adapter.getDataset().get(itemPosition);
-                    Intent intent = new Intent(wr.get(), CardActivity.class);
-                    intent.putExtra("id", tDoll.getId());
-                    wr.get().startActivity(intent);
-                }
-            }, tdolls);
+                    (TextView) wr.get().findViewById(R.id.lib_nores), v -> {
+                        int itemPosition = recyclerView.getChildLayoutPosition(v);
+                        TDollLibAdapter adapter = (TDollLibAdapter) recyclerView.getAdapter();
+                        if (adapter == null) return;
+                        TDoll tDoll = adapter.getDataset().get(itemPosition);
+                        Intent intent = new Intent(wr.get(), CardActivity.class);
+                        intent.putExtra("id", tDoll.getId());
+                        wr.get().startActivity(intent);
+                    }, tdolls);
             recyclerView.setAdapter(adapter);
-            wr.get().toolbar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    recyclerView.scrollToPosition(0);
-                }
-            });
+            wr.get().toolbar.setOnClickListener(v -> recyclerView.scrollToPosition(0));
 
             wr.get().invalidateOptionsMenu();
             wr.get().findViewById(R.id.lib_pb).setVisibility(View.GONE);
@@ -170,15 +162,12 @@ public class LibraryActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.time_title)
                         .setView(picker)
-                        .setPositiveButton(R.string.set, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (adapter == null) return;
-                                adapter.applyTimeFilter(hrs.getValue()*60 + mins.getValue());
-                                if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
-                                    adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
-                                invalidateOptionsMenu();
-                            }
+                        .setPositiveButton(R.string.set, (dialog, which) -> {
+                            if (adapter == null) return;
+                            adapter.applyTimeFilter(hrs.getValue()*60 + mins.getValue());
+                            if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)
+                                adapter.changeSort(TDollLibAdapter.SORT_CONSTR);
+                            invalidateOptionsMenu();
                         }).create().show();
                 return true;
             case R.id.lib_menu_clear:

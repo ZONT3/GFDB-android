@@ -493,7 +493,7 @@
             android:id="@+id/card_loadstring"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/card_loading"
+            android:text="@string/card_downloading"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -509,7 +509,7 @@
             android:theme="@style/AppTheme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_loadstring" />
+            app:layout_constraintTop_toBottomOf="@id/card_loadstring" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

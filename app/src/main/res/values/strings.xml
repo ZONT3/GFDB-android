@@ -34,12 +34,12 @@
     <string name="card_maxrof">Max.ROF</string>
     <string name="card_skills">Skills</string>
     <string name="lib_menu_filter">Filter</string>
-    <string name="lib_menu_fbt">Find by Time...</string>
+    <string name="lib_menu_fbt">Find by Time…</string>
     <string name="lib_nores">No results for such query</string>
     <string name="time_title">Find by crafting time</string>
     <string name="set">Set</string>
     <string name="lib_menu_reset_filters">Reset Filters</string>
-    <string name="card_loading">Downloading data...</string>
+    <string name="card_downloading">Downloading data…</string>
 
     <array name="card_links">
         <item>English version (gamepress.gg)</item>

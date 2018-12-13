@@ -264,21 +264,18 @@ public class CardActivity extends AppCompatActivity {
                                     ? ", "
                                     : "");
                 Snackbar.make(wr.get().findViewById(R.id.card_root), wr.get().getString(R.string.card_parserr, sb.toString()), Snackbar.LENGTH_LONG)
-                        .setAction(R.string.card_parserr_details, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                StringBuilder sb = new StringBuilder();
-                                for (NetParser.ParserException e : exceptions) {
-                                    sb.append(e.getMessage()).append(
-                                            exceptions.indexOf(e) != exceptions.size()-1
-                                                    ? ";\n\n"
-                                                    : "");
-                                }
-                                new AlertDialog.Builder(wr.get())
-                                        .setTitle(R.string.card_parserr_details_title)
-                                        .setMessage(sb.toString())
-                                        .create().show();
+                        .setAction(R.string.card_parserr_details, v -> {
+                            StringBuilder sb1 = new StringBuilder();
+                            for (NetParser.ParserException e : exceptions) {
+                                sb1.append(e.getMessage()).append(
+                                        exceptions.indexOf(e) != exceptions.size()-1
+                                                ? ";\n\n"
+                                                : "");
                             }
+                            new AlertDialog.Builder(wr.get())
+                                    .setTitle(R.string.card_parserr_details_title)
+                                    .setMessage(sb1.toString())
+                                    .create().show();
                         }).show();
             }
 
@@ -411,22 +408,12 @@ public class CardActivity extends AppCompatActivity {
 
                 final String url = dataset.get(position)[0].toString();
                 final String urldm = dataset.get(position)[1].toString();
-                holder.iw.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        v.getContext().startActivity(
-                                new Intent(Intent.ACTION_VIEW)
-                                        .setDataAndType(Uri.parse(url), "image/*"));
-                    }
-                });
-                holder.iwdmg.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        v.getContext().startActivity(
-                                new Intent(Intent.ACTION_VIEW)
-                                        .setDataAndType(Uri.parse(urldm), "image/*"));
-                    }
-                });
+                holder.iw.setOnClickListener(v -> v.getContext().startActivity(
+                        new Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(Uri.parse(url), "image/*")));
+                holder.iwdmg.setOnClickListener(v -> v.getContext().startActivity(
+                        new Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(Uri.parse(urldm), "image/*")));
             }
 
             @Override
@@ -455,13 +442,10 @@ public class CardActivity extends AppCompatActivity {
             case R.id.card_menu_link:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.card_menu_link)
-                        .setItems(R.array.card_links, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2().toString()))); break;
-                                    case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2fws().toString()))); break;
-                                }
+                        .setItems(R.array.card_links, (dialog, which) -> {
+                            switch (which) {
+                                case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2().toString()))); break;
+                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getLvl2fws().toString()))); break;
                             }
                         }).create().show();
                 return true;
