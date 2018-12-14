@@ -3,6 +3,7 @@ package ru.zont.gfdb;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -59,13 +60,27 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_menu_reload:
-                //noinspection ResultOfMethodCallIgnored
-                new File(getCacheDir(), "lastupd").delete();
-                startActivity(new Intent(MainActivity.this, LoadActivity.class));
-                finish();
+                reloadDB();
                 return true;
+            case R.id.main_menu_settings:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.load_selectserv)
+                        .setItems(R.array.servers, (dialog, which) -> {
+                            getPreferences(MODE_PRIVATE).edit()
+                                    .putString("server", getResources()
+                                            .getStringArray(R.array.servers_values)[which])
+                                    .apply();
+                            reloadDB();
+                        })
+                        .create().show();
             default: return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void reloadDB() {
+        new File(getCacheDir(), "lastupd").delete();
+        startActivity(new Intent(MainActivity.this, LoadActivity.class));
+        finish();
     }
 
     public void gotoLib(View v) {

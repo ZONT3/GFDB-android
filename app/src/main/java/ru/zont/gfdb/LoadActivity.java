@@ -31,7 +31,6 @@ import ru.zont.gfdb.core.TDolls;
 
 public class LoadActivity extends AppCompatActivity {
     private String gameServer;
-    private static final String[] SERVERS = { "EN", "TW" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,7 @@ public class LoadActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.load_selectserv)
                     .setItems(R.array.servers, (dialog, which) -> {
-                        gameServer = SERVERS[which];
+                        gameServer = getResources().getStringArray(R.array.servers_values)[which];
                         shPrefs.edit().putString("server", gameServer).apply();
                         load();
                     })

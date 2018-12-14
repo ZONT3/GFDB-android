@@ -62,8 +62,14 @@
         <item>EVA</item>
         <item>ROF</item>
     </array>
+
     <array name="servers">
         <item>English (Sunborn)</item>
         <item>Taiwan (Similar to CN)</item>
     </array>
+    <array name="servers_values">
+        <item>EN</item>
+        <item>TW</item>
+    </array>
+
 </resources>

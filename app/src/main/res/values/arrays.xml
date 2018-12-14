@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="servers_values">
-        <item>EN</item>
-        <item>TW</item>
-    </string-array>
-</resources>
