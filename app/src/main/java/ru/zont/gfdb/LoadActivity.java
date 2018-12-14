@@ -45,13 +45,14 @@ public class LoadActivity extends AppCompatActivity {
                         Dimension.toDp(dm.widthPixels, this), Dimension.toDp(dm.heightPixels, this),
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
 
-        SharedPreferences shPrefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE);
         gameServer = shPrefs.getString("server", "");
 
         assert gameServer != null;
         if (!gameServer.isEmpty()) load();
         else {
             new AlertDialog.Builder(this)
+                    .setCancelable(false)
                     .setTitle(R.string.load_selectserv)
                     .setItems(R.array.servers, (dialog, which) -> {
                         gameServer = getResources().getStringArray(R.array.servers_values)[which];

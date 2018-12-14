@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -66,13 +68,14 @@ public class MainActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.load_selectserv)
                         .setItems(R.array.servers, (dialog, which) -> {
-                            getPreferences(MODE_PRIVATE).edit()
+                            getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE).edit()
                                     .putString("server", getResources()
                                             .getStringArray(R.array.servers_values)[which])
                                     .apply();
                             reloadDB();
                         })
                         .create().show();
+                return true;
             default: return super.onOptionsItemSelected(item);
         }
     }

@@ -240,7 +240,9 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(TDoll... tDolls) {
-            Parser parser = new Parser(wr.get().getCacheDir(), "TW"); // TODO ANOTHER SERVERS
+            String server = wr.get().getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE)
+                    .getString("server", "EN");
+            Parser parser = new Parser(wr.get().getCacheDir(), server);
             try {
                 exceptions = parser.fullParse(tDolls[0]);
             } catch (Parser.ParserException e) {
