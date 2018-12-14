@@ -240,9 +240,9 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(TDoll... tDolls) {
-            Parser parser = new Parser(wr.get().getCacheDir(), "EN"); // TODO ANOTHER SERVERS
+            Parser parser = new Parser(wr.get().getCacheDir(), "TW"); // TODO ANOTHER SERVERS
             try {
-                exceptions = parser.parseAll(tDolls[0]);
+                exceptions = parser.fullParse(tDolls[0]);
             } catch (Parser.ParserException e) {
                 e.printStackTrace();
                 return null;
@@ -313,7 +313,12 @@ public class CardActivity extends AppCompatActivity {
             affects.setText("Affects "+tDoll.getAffect().toUpperCase());
             buffs.setText(Html.fromHtml(tDoll.getBuffs()));
             skills.loadDataWithBaseURL("", tDoll.getSkills(), "text/html", "UTF-8", "");
-            description.setText(tDoll.getDescription());
+            description.setText(Html.fromHtml(tDoll.getDescription()));
+
+            roles.setVisibility(tDoll.getRole().isEmpty() ? View.GONE : View.VISIBLE);
+            affects.setVisibility(tDoll.getAffect().isEmpty() ? View.GONE : View.VISIBLE);
+            skills.setVisibility(tDoll.getSkills().isEmpty() ? View.GONE : View.VISIBLE);
+            description.setVisibility(tDoll.getDescription().isEmpty() ? View.GONE : View.VISIBLE);
 
             RecyclerView rw = wr.get().findViewById(R.id.card_recycler);
             ArrayList<URL[]> urls = new ArrayList<>();
@@ -444,7 +449,7 @@ public class CardActivity extends AppCompatActivity {
             case R.id.card_menu_link:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.card_menu_link)
-                        .setItems(R.array.card_links, (dialog, which) -> {
+                        .setItems(R.array.card_links_en, (dialog, which) -> {
                             switch (which) {
                                 case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGamepress().toString()))); break;
                                 case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getFws().toString()))); break;

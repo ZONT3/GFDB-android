@@ -9,9 +9,10 @@
     <string name="load_parsing">Parsing…</string>
     <string name="load_error">An error occurred while parsing one of t-dolls.</string>
     <string name="load_preparing">Preparing…</string>
-    <string name="load_tdl">T-Doll list</string>
-    <string name="load_tnl">Thumbnail URLs</string>
-    <string name="load_aux">Wiki doll list</string>
+    <string name="load_gplist">Gamepress T-Doll list</string>
+    <string name="load_fwslist">GF.FWS.TW T-Doll list</string>
+    <string name="load_gpstat">Gamepress T-Doll stats</string>
+    <string name="load_fwsstat">GF.FWS.TW T-Doll stats</string>
     <string name="card_info">Information</string>
     <string name="card_cgs">CGs</string>
     <string name="card_menu_link">Links</string>
@@ -42,8 +43,9 @@
     <string name="card_downloading">Downloading data…</string>
     <string name="load_outdate">Reloading DB due to app update</string>
     <string name="load_fatal_err">A critical error occured. If app is not working, please, report it to developer.</string>
+    <string name="load_selectserv">Select game server</string>
 
-    <array name="card_links">
+    <array name="card_links_en">
         <item>English version (gamepress.gg)</item>
         <item>Taiwan version (gf.fws.tw)</item>
     </array>
@@ -58,5 +60,9 @@
         <item>ACC</item>
         <item>EVA</item>
         <item>ROF</item>
+    </array>
+    <array name="servers">
+        <item>English (Sunborn)</item>
+        <item>Taiwan (Similar to CN)</item>
     </array>
 </resources>

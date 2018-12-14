@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -29,8 +30,8 @@ import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.core.TDolls;
 
 public class LoadActivity extends AppCompatActivity {
-
     private String gameServer;
+    private static final String[] SERVERS = { "EN", "TW" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +47,23 @@ public class LoadActivity extends AppCompatActivity {
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
 
         SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE);
-        gameServer = shPrefs.getString("server", "EN");
+        gameServer = shPrefs.getString("server", "");
 
+        assert gameServer != null;
+        if (!gameServer.isEmpty()) load();
+        else {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.load_selectserv)
+                    .setItems(R.array.servers, (dialog, which) -> {
+                        gameServer = SERVERS[which];
+                        shPrefs.edit().putString("server", gameServer).apply();
+                        load();
+                    })
+                    .create().show();
+        }
+    }
+
+    private void load() {
         Date date = Calendar.getInstance().getTime();
         date.setTime(System.currentTimeMillis());
         File dateFile = new File(getCacheDir(), "lastupd");
@@ -86,16 +102,16 @@ public class LoadActivity extends AppCompatActivity {
         private static final int CODE_PARSING = 1;
         private static final int CODE_WRITING = 2;
 
-        WeakReference<LoadActivity> contextReference;
+        WeakReference<LoadActivity> wr;
         boolean finished = false;
 
         LoadList(LoadActivity context) {
-            contextReference = new WeakReference<>(context);
+            wr = new WeakReference<>(context);
         }
 
         @Override
         protected void onPreExecute() {
-            LoadActivity activity = contextReference.get();
+            LoadActivity activity = wr.get();
             ProgressBar progressBar = activity.findViewById(R.id.load_pb);
             TextView textView = activity.findViewById(R.id.load_text);
 
@@ -105,7 +121,7 @@ public class LoadActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            LoadActivity activity = contextReference.get();
+            LoadActivity activity = wr.get();
             if (activity == null || activity.isFinishing()) {
                 cancel(true);
                 return;
@@ -118,7 +134,7 @@ public class LoadActivity extends AppCompatActivity {
         @SuppressLint("DefaultLocale")
         @Override
         protected void onProgressUpdate(Integer... values) {
-            LoadActivity activity = contextReference.get();
+            LoadActivity activity = wr.get();
             if (activity == null || activity.isFinishing()) {
                 cancel(true);
                 return;
@@ -138,7 +154,7 @@ public class LoadActivity extends AppCompatActivity {
                     if (progressBar.getMax() != arg2) progressBar.setMax(arg2);
                     progressBar.setProgress(arg1);
                     textView.setText(R.string.load_dl);
-                    ex.setText(new int[] {R.string.load_tdl, R.string.load_tnl, R.string.load_stat, R.string.load_aux}[arg3]);
+                    ex.setText(new int[] {R.string.load_gplist, R.string.load_fwslist, R.string.load_gpstat, R.string.load_fwsstat}[arg3]);
                     break;
                 case CODE_PARSING:
                     if (progressBar.isIndeterminate()) progressBar.setIndeterminate(false);
@@ -152,20 +168,21 @@ public class LoadActivity extends AppCompatActivity {
                     ex.setVisibility(View.GONE);
                     if (!progressBar.isIndeterminate()) progressBar.setIndeterminate(true);
                     break;
-                case CODE_ERROR: Toast.makeText(contextReference.get(), R.string.load_error, Toast.LENGTH_LONG).show(); break;
+                case CODE_ERROR: Toast.makeText(wr.get(), R.string.load_error, Toast.LENGTH_LONG).show(); break;
             }
         }
 
         @Override
         protected void onCancelled() {
-            Toast.makeText(contextReference.get(), R.string.load_fatal_err, Toast.LENGTH_LONG).show();
-            contextReference.get().finish();
+            Toast.makeText(wr.get(), R.string.load_fatal_err, Toast.LENGTH_LONG).show();
+            wr.get().finish();
         }
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         protected Void doInBackground(Void... voids) {
-            Parser parser = new Parser(contextReference.get().getCacheDir(), "EN", true);
+            LoadActivity activity = wr.get();
+            Parser parser = new Parser(activity.getCacheDir(), activity.gameServer, true);
             for (int i = 0; i < Parser.FILES_COUNT; i++) {
                 publishProgress(CODE_DL, i, Parser.FILES_COUNT, i);
                 parser.prepare(i);
@@ -192,7 +209,7 @@ public class LoadActivity extends AppCompatActivity {
 
             publishProgress(CODE_WRITING, 0, 0, 0);
             try {
-                File file = new File(contextReference.get().getCacheDir(), "cachedList");
+                File file = new File(activity.getCacheDir(), "cachedList");
                 if (file.exists()) file.delete();
                 FileOutputStream fos = new FileOutputStream(file);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
