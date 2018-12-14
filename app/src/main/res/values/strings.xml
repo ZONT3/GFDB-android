@@ -17,7 +17,7 @@
     <string name="card_menu_link">Links</string>
     <string name="card_pattern">Buff Pattern</string>
     <string name="load_stat">Stat values</string>
-    <string name="card_parserr">Error while parsing:\n%s</string>
+    <string name="card_parserr">Some elements has not parsed</string>
     <string name="card_parserr_details">Details…</string>
     <string name="card_parserr_details_title">Parser errors</string>
     <string name="main_menu_reload">Reload DB</string>
@@ -41,6 +41,7 @@
     <string name="lib_menu_reset_filters">Reset Filters</string>
     <string name="card_downloading">Downloading data…</string>
     <string name="load_outdate">Reloading DB due to app update</string>
+    <string name="load_fatal_err">A critical error occured. If app is not working, please, report it to developer.</string>
 
     <array name="card_links">
         <item>English version (gamepress.gg)</item>

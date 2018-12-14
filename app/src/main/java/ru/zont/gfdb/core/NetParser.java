@@ -27,7 +27,6 @@ import java.util.HashMap;
 * Здесь пизда быдлокод, я знаю.
 * ZONT_
 *
-* TODO СОЗДАТЬ НОВЫЙ КЛАСС, ОСНОВЫВАЯСЬ НА ЭТОМ
 * */
 
 @Deprecated
@@ -204,7 +203,7 @@ public class NetParser {
 //                                doll.wiki = new URL("https://en.gfwiki.com/wiki/" + e.attr("data-server-doll"));
 //                        } catch (Exception ignored) {}
 //                    }
-                    if (gftwentry != null) doll.gffwstw = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
+                    if (gftwentry != null) doll.fws = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
 
                     doll.parsingLevel = 1;
                 }
@@ -212,7 +211,7 @@ public class NetParser {
                     Element root = Jsoup.connect(doll.gamepress.toString()).get().body();
                     Element gftwRoot = null;
                     if (gftwentry != null)
-                        gftwRoot = Jsoup.connect(doll.gffwstw.toString()).get().body();
+                        gftwRoot = Jsoup.connect(doll.fws.toString()).get().body();
 
                     try {
                         doll.cgMain = new URL("http://gamepress.gg"

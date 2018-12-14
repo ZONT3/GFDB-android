@@ -39,13 +39,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 
 import ru.zont.gfdb.core.Dimension;
-import ru.zont.gfdb.core.NetParser;
+import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
 
 public class CardActivity extends AppCompatActivity {
@@ -235,15 +234,19 @@ public class CardActivity extends AppCompatActivity {
 
     private static class Lvl2Parser extends AsyncTask<TDoll, Void, TDoll> {
         WeakReference<CardActivity> wr;
-        ArrayList<NetParser.ParserException> exceptions;
+        ArrayList<Parser.ParserException> exceptions;
 
         Lvl2Parser(WeakReference<CardActivity> wr) { this.wr = wr; }
 
         @Override
         protected TDoll doInBackground(TDoll... tDolls) {
-            NetParser parser = new NetParser(wr.get(), "EN");
-            exceptions = parser.parseDoll(tDolls[0], 2);
-            if (exceptions == null) return null;
+            Parser parser = new Parser(wr.get().getCacheDir(), "EN"); // TODO ANOTHER SERVERS
+            try {
+                exceptions = parser.parseAll(tDolls[0]);
+            } catch (Parser.ParserException e) {
+                e.printStackTrace();
+                return null;
+            }
             return tDolls[0];
         }
 
@@ -259,17 +262,14 @@ public class CardActivity extends AppCompatActivity {
             }
 
             if (exceptions.size() > 0) {
-                StringBuilder sb = new StringBuilder();
-                for (NetParser.ParserException e : exceptions)
-                    sb.append(e.getElementName())
-                            .append(exceptions.indexOf(e) != exceptions.size()-1
-                                    ? ", "
-                                    : "");
-                Snackbar.make(wr.get().findViewById(R.id.card_root), wr.get().getString(R.string.card_parserr, sb.toString()), Snackbar.LENGTH_LONG)
+                Snackbar.make(wr.get().findViewById(R.id.card_root), wr.get().getString(R.string.card_parserr), Snackbar.LENGTH_LONG)
                         .setAction(R.string.card_parserr_details, v -> {
                             StringBuilder sb1 = new StringBuilder();
-                            for (NetParser.ParserException e : exceptions) {
-                                sb1.append(e.getMessage()).append(
+                            for (Parser.ParserException e : exceptions) {
+                                sb1.append(e.getMessage())
+                                        .append(", Caused by: ")
+                                        .append(e.getCause().getLocalizedMessage())
+                                        .append(
                                         exceptions.indexOf(e) != exceptions.size()-1
                                                 ? ";\n\n"
                                                 : "");
@@ -447,7 +447,7 @@ public class CardActivity extends AppCompatActivity {
                         .setItems(R.array.card_links, (dialog, which) -> {
                             switch (which) {
                                 case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGamepress().toString()))); break;
-                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGffwstw().toString()))); break;
+                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getFws().toString()))); break;
                             }
                         }).create().show();
                 return true;

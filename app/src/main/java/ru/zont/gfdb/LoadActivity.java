@@ -24,7 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import ru.zont.gfdb.core.Dimension;
-import ru.zont.gfdb.core.NetParser;
+import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.core.TDolls;
 
@@ -156,29 +156,38 @@ public class LoadActivity extends AppCompatActivity {
             }
         }
 
+        @Override
+        protected void onCancelled() {
+            Toast.makeText(contextReference.get(), R.string.load_fatal_err, Toast.LENGTH_LONG).show();
+            contextReference.get().finish();
+        }
+
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         protected Void doInBackground(Void... voids) {
-            NetParser parser;
-            try {
-                publishProgress(CODE_DL, 0, 4, NetParser.TDLIST);
-                parser = new NetParser(contextReference.get(), NetParser.TDLIST,
-                        contextReference.get().gameServer);
-                publishProgress(CODE_DL, 1, 4, NetParser.TNLIST);
-                parser.prepare(contextReference.get(), NetParser.TNLIST);
-                publishProgress(CODE_DL, 2, 4, NetParser.STATLIST);
-                parser.prepare(contextReference.get(), NetParser.STATLIST);
-                publishProgress(CODE_DL, 3, 4, NetParser.WIKI);
-                parser.prepare(contextReference.get(), NetParser.WIKI);
+            Parser parser = new Parser(contextReference.get().getCacheDir(), "EN", true);
+            for (int i = 0; i < Parser.FILES_COUNT; i++) {
+                publishProgress(CODE_DL, i, Parser.FILES_COUNT, i);
+                parser.prepare(i);
             }
-            catch (IOException e) { e.printStackTrace(); return null; }
 
-            TDolls list = parser.loadTDL();
-            for (int i = 0; i < list.size(); i++) {
-                TDoll doll = list.get(i);
-                publishProgress(CODE_PARSING, i, list.size(), 0);
-                if (parser.parseDoll(doll, 1) == null) publishProgress(CODE_ERROR,0,0,0);
-                //try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
+            TDolls list;
+            try {
+                list = parser.getList();
+                for (int i = 0; i < list.size(); i++) {
+                    TDoll doll = list.get(i);
+                    publishProgress(CODE_PARSING, i, list.size(), 0);
+                    try {
+                        parser.baseParse(doll);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                        publishProgress(CODE_ERROR, 0, 0, 0);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                cancel(true);
+                return null;
             }
 
             publishProgress(CODE_WRITING, 0, 0, 0);

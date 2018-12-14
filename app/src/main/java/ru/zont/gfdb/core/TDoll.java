@@ -30,7 +30,7 @@ public class TDoll implements Serializable {
 
     URL thumb;
     URL gamepress;
-    URL gffwstw;
+    URL fws;
     URL wiki;
 
     // ---------------------- LEVEL 2 PARSING
@@ -114,7 +114,7 @@ public class TDoll implements Serializable {
 
     public URL getGamepress() { return gamepress; }
 
-    public URL getGffwstw() { return gffwstw; }
+    public URL getFws() { return fws; }
     
     public URL getWiki() { return wiki; }
 
