@@ -42,8 +42,9 @@
     <string name="lib_menu_reset_filters">Reset Filters</string>
     <string name="card_downloading">Downloading data…</string>
     <string name="load_outdate">Reloading DB due to app update</string>
-    <string name="load_fatal_err">A critical error occured. If app is not working, please, report it to developer.</string>
+    <string name="load_fatal_err">A critical error occurred. If app is not working, please, report it to developer.</string>
     <string name="load_selectserv">Select game server</string>
+    <string name="prefs_server">Game Server</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>

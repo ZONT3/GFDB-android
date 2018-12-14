@@ -46,7 +46,7 @@ public class LoadActivity extends AppCompatActivity {
                         Dimension.toDp(dm.widthPixels, this), Dimension.toDp(dm.heightPixels, this),
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
 
-        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE);
+        SharedPreferences shPrefs = getPreferences(MODE_PRIVATE);
         gameServer = shPrefs.getString("server", "");
 
         assert gameServer != null;

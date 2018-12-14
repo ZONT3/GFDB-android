@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ListPreference
+        android:defaultValue="EN"
+        android:entries="@array/servers"
+        android:entryValues="@array/servers_values"
+        android:key="server"
+        android:title="@string/prefs_server" />
 </PreferenceScreen>
