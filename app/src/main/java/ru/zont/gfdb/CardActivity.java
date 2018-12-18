@@ -312,7 +312,7 @@ public class CardActivity extends AppCompatActivity {
                         .into(cg);
 
             roles.setText(tDoll.getRole());
-            affects.setText("Affects "+tDoll.getAffect().toUpperCase());
+            affects.setText(activity.getString(R.string.card_affects)+" "+tDoll.getAffect().toUpperCase());
             buffs.setText(Html.fromHtml(tDoll.getBuffs()));
             skills.loadDataWithBaseURL("", tDoll.getSkills(), "text/html", "UTF-8", "");
             description.setText(Html.fromHtml(tDoll.getDescription()));

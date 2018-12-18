@@ -42,6 +42,7 @@
     <string name="load_fatal_err">A critical error occurred. If app is not working, please, report it to developer.</string>
     <string name="load_selectserv">Select game server</string>
     <string name="prefs_server">Game Server</string>
+    <string name="card_affects" translatable="false">Affects</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>
