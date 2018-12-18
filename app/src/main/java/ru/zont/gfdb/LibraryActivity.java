@@ -167,7 +167,7 @@ public class LibraryActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.time_title)
                         .setView(picker)
-                        .setPositiveButton(R.string.set, (dialog, which) -> {
+                        .setPositiveButton(R.string.time_set, (dialog, which) -> {
                             if (adapter == null) return;
                             adapter.applyTimeFilter(hrs.getValue()*60 + mins.getValue());
                             if (adapter.getSort() != TDollLibAdapter.SORT_CONSTR)

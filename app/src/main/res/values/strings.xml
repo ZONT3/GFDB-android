@@ -4,8 +4,6 @@
     <string name="load_dl">Downloading T-Doll list…</string>
     <string name="load_writing">Writing to cache…</string>
     <string name="main_library">Library</string>
-    <string name="lib_noresults">There are no dolls matching your filters</string>
-    <string name="lib_reset">Reset filters</string>
     <string name="load_parsing">Parsing…</string>
     <string name="load_error">An error occurred while parsing one of t-dolls.</string>
     <string name="load_preparing">Preparing…</string>
@@ -27,21 +25,20 @@
     <string name="lib_menu_search">Search</string>
     <string name="lib_menu_sort">Sort</string>
     <string name="lib_menu_sort_reverse">Reverse</string>
-    <string name="main_cg">main cg</string>
-    <string name="card_maxhp">Max.HP</string>
-    <string name="card_maxdmg">Max.DMG</string>
-    <string name="card_maxacc">Max.ACC</string>
-    <string name="card_maxeva">Max.EVA</string>
-    <string name="card_maxrof">Max.ROF</string>
+    <string name="main_cg" translatable="false">main cg</string>
+    <string name="card_maxhp" translatable="false">Max.HP</string>
+    <string name="card_maxdmg" translatable="false">Max.DMG</string>
+    <string name="card_maxacc" translatable="false">Max.ACC</string>
+    <string name="card_maxeva" translatable="false">Max.EVA</string>
+    <string name="card_maxrof" translatable="false">Max.ROF</string>
     <string name="card_skills">Skills</string>
     <string name="lib_menu_filter">Filter</string>
     <string name="lib_menu_fbt">Find by Time…</string>
     <string name="lib_nores">No results for such query</string>
     <string name="time_title">Find by crafting time</string>
-    <string name="set">Set</string>
+    <string name="time_set">Set</string>
     <string name="lib_menu_reset_filters">Reset Filters</string>
     <string name="card_downloading">Downloading data…</string>
-    <string name="load_outdate">Reloading DB due to app update</string>
     <string name="load_fatal_err">A critical error occurred. If app is not working, please, report it to developer.</string>
     <string name="load_selectserv">Select game server</string>
     <string name="prefs_server">Game Server</string>

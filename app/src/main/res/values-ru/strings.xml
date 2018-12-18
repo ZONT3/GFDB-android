@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Girls\' Frontline DB</string>
+    <string name="load_loading">Загрузка…</string>
+    <string name="load_dl">Загрузка списков…</string>
+    <string name="load_writing">Запись в кэш…</string>
+    <string name="main_library">Библиотека</string>
+    <string name="load_parsing">Парсинг…</string>
+    <string name="load_error">При загрузке одной из кукол произошла ошибка</string>
+    <string name="load_preparing">Подготовка…</string>
+    <string name="load_gplist">Список из Gamepress</string>
+    <string name="load_fwslist">Список из fws.tw</string>
+    <string name="load_gpstat">Статы из Gamepress</string>
+    <string name="load_fwsstat">Статы из fws.tw</string>
+    <string name="card_info">Информация</string>
+    <string name="card_cgs">CG</string>
+    <string name="card_menu_link">Ссылки</string>
+    <string name="card_pattern">Сетка баффов</string>
+    <string name="load_stat">Значения статов</string>
+    <string name="card_parserr">Некоторые элементы не были запарсены</string>
+    <string name="card_parserr_details">Детали…</string>
+    <string name="card_parserr_details_title">Ошибки парсера</string>
+    <string name="main_menu_reload">Перезагрузить базу</string>
+    <string name="main_menu_settings">Настройки</string>
+    <string name="card_cg_main">Обычное CG</string>
+    <string name="lib_menu_search">Поиск</string>
+    <string name="lib_menu_sort">Сортировка</string>
+    <string name="lib_menu_sort_reverse">Реверс</string>
+    <string name="card_skills">Скиллы</string>
+    <string name="lib_menu_filter">Фильтры</string>
+    <string name="lib_menu_fbt">Найти по времени…</string>
+    <string name="lib_nores">Нет результатов по данному запросу</string>
+    <string name="time_title">Найти по времени крафта</string>
+    <string name="time_set">Найти</string>
+    <string name="lib_menu_reset_filters">Сбросить фильтры</string>
+    <string name="card_downloading">Загрузка данных…</string>
+    <string name="load_fatal_err">Произошла критическая ошибка. Если прилоение не работает после переустановки, свяжитесь с разработчиком.</string>
+    <string name="load_selectserv">Выберите сервер игры</string>
+    <string name="prefs_server">Игровой сервер</string>
+
+    <array name="lib_sort_arr">
+        <item>No.</item>
+        <item>Имя</item>
+        <item>Редкость</item>
+        <item>Время постр.</item>
+        <item>Тип</item>
+        <item>HP</item>
+        <item>DMG</item>
+        <item>ACC</item>
+        <item>EVA</item>
+        <item>ROF</item>
+    </array>
+</resources>
