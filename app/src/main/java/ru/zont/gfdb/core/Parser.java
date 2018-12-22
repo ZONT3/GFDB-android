@@ -342,13 +342,14 @@ public class Parser {
                 for (Element e : roles.first().getElementsByClass("field__item"))
                     b.append(" ").append(e.text());
                 doll.role = b.toString().replaceFirst(" ", "");
-            }
+            } else doll.role = "";
         } catch (Exception pe) { exceptions.add(new ParserException(doll, "Roles", pe)); doll.role = ""; }
 
         try {
             Element p = root.getElementsContainingOwnText("History").first().nextElementSibling();
             if (p.tagName().equals("p")) doll.description = p.text();
-        }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.role = ""; }
+            else doll.description = "";
+        }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.description = ""; }
 
         try {
             if (gftwRoot == null) throw new ParserException("gf.fws.tw page is absent");
