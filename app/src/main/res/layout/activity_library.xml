@@ -13,6 +13,9 @@
         android:background="?attr/colorPrimary"
         android:elevation="3dp"
         android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:title="@string/main_library" />
 
     <android.support.v7.widget.RecyclerView

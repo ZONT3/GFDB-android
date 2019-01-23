@@ -60,7 +60,6 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
     static final int SORT_ROF = 9;
 
     private static final ArrayList<String> TYPES_ORDER = gto();
-    private static final long PAUSE_BETWEEN_FILTER_CHANGES = 300;
 
     private String searchQuery = "";
     private int timeMins = -1;
@@ -205,7 +204,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                 .into(holder.mThumb);
     }
 
-    public static class GFTWTransform extends BitmapTransformation {
+    static class GFTWTransform extends BitmapTransformation {
         private static final String ID = "ru.zont.gfdb.TDollLibAdapter.GFTWTransform";
 
         @Override

@@ -56,12 +56,19 @@ public class CardActivity extends AppCompatActivity {
             {R.id.card_pattern_4, R.id.card_pattern_5, R.id.card_pattern_6},
             {R.id.card_pattern_7, R.id.card_pattern_8, R.id.card_pattern_9}};
 
+    static final String TN_CONTENT = "transition:card:content";
+
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
     private ViewGroup content;
     private ViewGroup loadView;
+    private ViewPager viewPager;
+    private View toTransist;
 
     private TDoll doll;
+
+    private boolean mfReady = false;
+    private boolean cgfReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +76,19 @@ public class CardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_card);
         Toolbar toolbar = findViewById(R.id.card_tb);
         setSupportActionBar(toolbar);
-        assert getSupportActionBar() != null;
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setDisplayShowHomeEnabled(true);
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
 
+        toTransist = null;
         if (!getResources().getBoolean(R.bool.card_tabless)) {
-            ViewPager viewPager = findViewById(R.id.card_viewpager);
+            viewPager = findViewById(R.id.card_viewpager);
             viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
-                private Fragment[] fragments = new Fragment[]{new MainFragment().setWR(CardActivity.this), new CGFragment()};
+                private Fragment[] fragments = new Fragment[]{
+                        new MainFragment().setWR(CardActivity.this),
+                        new CGFragment().setWR(CardActivity.this)
+                };
 
                 @Override
                 public Fragment getItem(int position) {
@@ -94,21 +106,25 @@ public class CardActivity extends AppCompatActivity {
                     return new String[]{getString(R.string.card_info), getString(R.string.card_cgs)}[position];
                 }
             });
-        } else {
-            content = findViewById(R.id.card_content);
-            loadView = findViewById(R.id.card_load);
-            content.setVisibility(View.INVISIBLE);
-            loadView.setVisibility(View.VISIBLE);
-        }
+            toTransist = viewPager;
+        } else onCreateMainFragment(null);
+        if (toTransist == null) toTransist = findViewById(R.id.card_content);
+        toTransist.setTransitionName(TN_CONTENT);
 
         int id = getIntent().getIntExtra("id", -1);
         if (id < 0) {
             Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
-            finish();
+            finishAfterTransition();
         }
 
-        parser1 = new Lvl1Parser(this);
-        parser1.execute(id);
+        new Thread(() -> {
+            try {
+                while (!(mfReady && cgfReady)) Thread.sleep(100);
+            } catch (InterruptedException ignored) { }
+
+            parser1 = new Lvl1Parser(this);
+            parser1.execute(id);
+        }).start();
     }
 
     public static class MainFragment extends Fragment {
@@ -122,20 +138,38 @@ public class CardActivity extends AppCompatActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_card_main, container, false);
-            wr.get().content = view.findViewById(R.id.card_content);
-            wr.get().loadView = view.findViewById(R.id.card_load);
-            wr.get().content.setVisibility(View.INVISIBLE);
-            wr.get().loadView.setVisibility(View.VISIBLE);
+            wr.get().onCreateMainFragment(view);
+            wr.get().mfReady = true;
             return view;
         }
     }
 
     public static class CGFragment extends Fragment {
+        private WeakReference<CardActivity> wr;
+        private CGFragment setWR(CardActivity activity) {
+            wr = new WeakReference<>(activity);
+            return this;
+        }
+
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            wr.get().cgfReady = true;
             return inflater.inflate(R.layout.fragment_card_cgs, container, false);
         }
+    }
+
+    private void onCreateMainFragment(@Nullable View parent) {
+        if (parent == null) {
+            content = findViewById(R.id.card_content);
+            loadView = findViewById(R.id.card_load);
+        } else {
+            content = parent.findViewById(R.id.card_content);
+            loadView = parent.findViewById(R.id.card_load);
+        }
+
+        content.setVisibility(View.INVISIBLE);
+        loadView.setVisibility(View.VISIBLE);
     }
 
     /*
@@ -174,7 +208,7 @@ public class CardActivity extends AppCompatActivity {
             if (activity == null || activity.isFinishing()) return;
             if (tDoll==null) {
                 Toast.makeText(wr.get(), "Invalid ID", Toast.LENGTH_SHORT).show();
-                wr.get().finish();
+                wr.get().finishAfterTransition();
                 return;
             }
 
@@ -259,7 +293,7 @@ public class CardActivity extends AppCompatActivity {
             if (activity == null || activity.isFinishing()) return;
             if (tDoll == null) {
                 Toast.makeText(wr.get(), "Error while parsing", Toast.LENGTH_SHORT).show();
-                wr.get().finish();
+                wr.get().finishAfterTransition();
                 return;
             }
 
@@ -291,7 +325,7 @@ public class CardActivity extends AppCompatActivity {
             TextView description = wr.get().findViewById(R.id.card_desc);
             final ProgressBar cgPb = wr.get().findViewById(R.id.card_cgpb);
 
-            if (cg!=null && tDoll.getCgMain() != null && tDoll.getCgDamage() != null)
+            if (tDoll.getCgMain() != null && tDoll.getCgDamage() != null)
                 Glide.with(wr.get())
                         .load(tDoll.getCgMain().toString())
                         .apply(new RequestOptions()
@@ -352,6 +386,8 @@ public class CardActivity extends AppCompatActivity {
             cardActivity.content.startAnimation(AnimationUtils.loadAnimation(cardActivity, R.anim.fadein));
             cardActivity.loadView.setVisibility(View.GONE);
             cardActivity.content.setVisibility(View.VISIBLE);
+            if (cardActivity.toTransist != null) cardActivity.toTransist.setTransitionName(null);
+            cg.setTransitionName(TN_CONTENT);
         }
 
         private static class CgAdapter extends RecyclerView.Adapter<CgAdapter.VH> {
@@ -443,6 +479,11 @@ public class CardActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAfterTransition();
     }
 
     @Override

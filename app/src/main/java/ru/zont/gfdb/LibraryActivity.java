@@ -1,6 +1,7 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -63,7 +64,7 @@ public class LibraryActivity extends AppCompatActivity {
                         TDoll tDoll = adapter.getDataset().get(itemPosition);
                         Intent intent = new Intent(wr.get(), CardActivity.class);
                         intent.putExtra("id", tDoll.getId());
-                        wr.get().startActivity(intent);
+                        wr.get().startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(wr.get(), v, CardActivity.TN_CONTENT).toBundle());
                     }, tdolls);
             recyclerView.setAdapter(adapter);
 
@@ -197,9 +198,4 @@ public class LibraryActivity extends AppCompatActivity {
         return super.onNavigateUp();
     }
 
-    @Override
-    protected void onDestroy() {
-        //adapter.onDestroy();
-        super.onDestroy();
-    }
 }

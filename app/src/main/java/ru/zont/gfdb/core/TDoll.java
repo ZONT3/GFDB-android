@@ -31,7 +31,7 @@ public class TDoll implements Serializable {
     URL thumb;
     URL gamepress;
     URL fws;
-    URL wiki;
+//    URL wiki;
 
     // ---------------------- LEVEL 2 PARSING
     URL cgMain;
@@ -116,7 +116,7 @@ public class TDoll implements Serializable {
 
     public URL getFws() { return fws; }
     
-    public URL getWiki() { return wiki; }
+//    public URL getWiki() { return wiki; }
 
     @Override
     public boolean equals(Object obj) {

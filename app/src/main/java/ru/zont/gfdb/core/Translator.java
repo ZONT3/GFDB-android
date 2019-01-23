@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 
-public class Translator {
+class Translator {
     private static final String API_KEY = "trnsl.1.1.20181218T063541Z.d45e60c6ac027dd5.6dc7c2bf18d5c211a3cd4b1fafa60e5bc71426e7";
 
     @SuppressLint("UseSparseArrays")

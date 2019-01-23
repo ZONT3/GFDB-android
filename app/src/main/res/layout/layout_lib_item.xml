@@ -41,7 +41,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lib_item_meta"
             app:layout_constraintBottom_toTopOf="@id/lib_item_title"
-            tools:srcCompat="@tools:sample/avatars" />
+            tools:srcCompat="@tools:sample/avatars"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/lib_item_title"
@@ -70,7 +71,8 @@
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/lib_item_thumb"
-            app:layout_constraintTop_toBottomOf="@id/lib_item_meta" />
+            app:layout_constraintTop_toBottomOf="@id/lib_item_meta"
+            tools:ignore="RtlSymmetry" />
 
         <ProgressBar
             android:id="@+id/lib_item_pb"
