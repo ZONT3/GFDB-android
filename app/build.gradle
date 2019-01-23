@@ -14,8 +14,8 @@ android {
         applicationId "ru.zont.gfdb"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 8
-        versionName "1.0.1"
+        versionCode 9
+        versionName "1.0.2pre"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
     }
