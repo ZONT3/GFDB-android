@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +58,7 @@ public class CardActivity extends AppCompatActivity {
             {R.id.card_pattern_7, R.id.card_pattern_8, R.id.card_pattern_9}};
 
     static final String TN_CONTENT = "transition:card:content";
+    private static final String LOG = "CardActivity";
 
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
@@ -69,6 +71,7 @@ public class CardActivity extends AppCompatActivity {
 
     private boolean mfReady = false;
     private boolean cgfReady = false;
+    private boolean isTabless;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +85,7 @@ public class CardActivity extends AppCompatActivity {
         supportActionBar.setDisplayHomeAsUpEnabled(true);
 
         toTransist = null;
-        if (!getResources().getBoolean(R.bool.card_tabless)) {
+        if (!(isTabless = getResources().getBoolean(R.bool.card_tabless))) {
             viewPager = findViewById(R.id.card_viewpager);
             viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
                 private Fragment[] fragments = new Fragment[]{
@@ -108,7 +111,7 @@ public class CardActivity extends AppCompatActivity {
             });
             toTransist = viewPager;
         } else onCreateMainFragment(null);
-        if (toTransist == null) toTransist = findViewById(R.id.card_content);
+        if (toTransist == null) toTransist = findViewById(R.id.card_toTranslate);
         toTransist.setTransitionName(TN_CONTENT);
 
         int id = getIntent().getIntExtra("id", -1);
@@ -118,12 +121,17 @@ public class CardActivity extends AppCompatActivity {
         }
 
         new Thread(() -> {
-            try {
-                while (!(mfReady && cgfReady)) Thread.sleep(100);
-            } catch (InterruptedException ignored) { }
+            if (!isTabless) {
+                try {
+                    while (!(mfReady && cgfReady)) Thread.sleep(100);
+                } catch (InterruptedException ignored) { }
+            }
 
-            parser1 = new Lvl1Parser(this);
-            parser1.execute(id);
+            runOnUiThread(() -> {
+                Log.d(LOG, "Starting AsyncTask");
+                parser1 = new Lvl1Parser(this);
+                parser1.execute(id);
+            });
         }).start();
     }
 
@@ -325,7 +333,7 @@ public class CardActivity extends AppCompatActivity {
             TextView description = wr.get().findViewById(R.id.card_desc);
             final ProgressBar cgPb = wr.get().findViewById(R.id.card_cgpb);
 
-            if (tDoll.getCgMain() != null && tDoll.getCgDamage() != null)
+            if (cg != null && tDoll.getCgMain() != null && tDoll.getCgDamage() != null)
                 Glide.with(wr.get())
                         .load(tDoll.getCgMain().toString())
                         .apply(new RequestOptions()
@@ -367,7 +375,7 @@ public class CardActivity extends AppCompatActivity {
             urls.addAll(tDoll.getCostumes());
             titles.addAll(tDoll.getCostitles());
             rw.setLayoutManager(new LinearLayoutManager(wr.get(), LinearLayoutManager.VERTICAL, false));
-            rw.setAdapter(new CgAdapter(urls, titles));
+            rw.setAdapter(new CgAdapter(urls, titles, cg == null));
 
             if (tDoll.getPattern() != null) {
                 for (int x = 0; x < tDoll.getPattern().length; x++) {
@@ -387,12 +395,13 @@ public class CardActivity extends AppCompatActivity {
             cardActivity.loadView.setVisibility(View.GONE);
             cardActivity.content.setVisibility(View.VISIBLE);
             if (cardActivity.toTransist != null) cardActivity.toTransist.setTransitionName(null);
-            cg.setTransitionName(TN_CONTENT);
+            if (cg != null) cg.setTransitionName(TN_CONTENT);
         }
 
         private static class CgAdapter extends RecyclerView.Adapter<CgAdapter.VH> {
             private ArrayList<String> titles;
             private ArrayList<URL[]> dataset;
+            private boolean cMark;
 
             static class VH extends RecyclerView.ViewHolder {
                 ProgressBar pb;
@@ -409,9 +418,10 @@ public class CardActivity extends AppCompatActivity {
                 }
             }
 
-            CgAdapter(ArrayList<URL[]> urls, ArrayList<String> titles) {
+            CgAdapter(ArrayList<URL[]> urls, ArrayList<String> titles, boolean mark) {
                 dataset = urls;
                 this.titles = titles;
+                cMark = mark;
             }
 
             @NonNull
@@ -459,6 +469,8 @@ public class CardActivity extends AppCompatActivity {
                 holder.iwdmg.setOnClickListener(v -> v.getContext().startActivity(
                         new Intent(Intent.ACTION_VIEW)
                                 .setDataAndType(Uri.parse(urldm), "image/*")));
+
+                if (position == 0 && cMark) holder.iw.setTransitionName(TN_CONTENT);
             }
 
             @Override
