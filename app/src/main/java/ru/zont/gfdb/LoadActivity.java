@@ -1,15 +1,18 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
+import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +33,14 @@ import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.core.TDolls;
 
 public class LoadActivity extends AppCompatActivity {
+    private static final String SYS_PREFS = "ru.zont.gfdb.sys";
     private String gameServer;
+    private SharedPreferences sysPrefs;
+
+    private TextView currserv;
+    private Button changeserv;
+
+    private LoadList loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +55,15 @@ public class LoadActivity extends AppCompatActivity {
                         Dimension.toDp(dm.widthPixels, this), Dimension.toDp(dm.heightPixels, this),
                         Math.sqrt((dm.widthPixels*dm.widthPixels) + (dm.heightPixels*dm.heightPixels))/dm.densityDpi));
 
-        SharedPreferences shPrefs = getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE);
-        gameServer = shPrefs.getString("server", "");
+        sysPrefs = getSharedPreferences(SYS_PREFS, MODE_PRIVATE);
+        SharedPreferences shPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        gameServer = sysPrefs.getInt("lastStartVer", 0) == 0
+                ? "" : shPrefs.getString("server", "");
+
+        currserv = findViewById(R.id.load_server);
+        changeserv = findViewById(R.id.load_changeserv);
+        currserv.setVisibility(View.GONE);
+        changeserv.setVisibility(View.GONE);
 
         assert gameServer != null;
         if (!gameServer.isEmpty()) load();
@@ -81,7 +98,6 @@ public class LoadActivity extends AppCompatActivity {
             }
         }
 
-        SharedPreferences sysPrefs = getSharedPreferences("ru.zont.gfdb.sys", MODE_PRIVATE);
         //noinspection ConstantConditions
         if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE
                 || BuildConfig.VERSION_NAME.contains("-EX")) {
@@ -102,13 +118,27 @@ public class LoadActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.load_clearCache)
                         .setPositiveButton(R.string.yes, (i1, i2) -> {
-                            for (File f : getCacheDir().listFiles())
-                                if (!f.isDirectory()) f.delete();
-                            new LoadList(this).execute();
+                            clearDir(getCacheDir());
+                            startActivity(new Intent(this, LoadActivity.class));
+                            finish();
                         })
-                        .setNegativeButton(R.string.no, (i1, i2) -> new LoadList(this).execute())
+//                        .setNegativeButton(R.string.load_cleardata, (i1, i2) -> {
+//                            clearDir(getCacheDir());
+//                            clearDir(getFilesDir());
+//                            startActivity(new Intent(this, LoadActivity.class));
+//                            finish();
+//                        })
+                        .setNegativeButton(R.string.no, null)
+                        .setOnDismissListener(dialog -> new LoadList(this))
                         .create().show();
-            } else new LoadList(this).execute();
+            } else loader = new LoadList(this);
+        }
+    }
+
+    private static void clearDir(File dir) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory()) clearDir(f);
+            f.delete();
         }
     }
 
@@ -123,6 +153,7 @@ public class LoadActivity extends AppCompatActivity {
 
         LoadList(LoadActivity context) {
             wr = new WeakReference<>(context);
+            execute();
         }
 
         @Override
@@ -130,6 +161,17 @@ public class LoadActivity extends AppCompatActivity {
             LoadActivity activity = wr.get();
             ProgressBar progressBar = activity.findViewById(R.id.load_pb);
             TextView textView = activity.findViewById(R.id.load_text);
+
+            activity.currserv.setVisibility(View.VISIBLE);
+            activity.changeserv.setVisibility(View.VISIBLE);
+            activity.currserv.setText(activity.getString(R.string.load_selectedserver, activity.gameServer));
+            activity.changeserv.setOnClickListener(v -> {
+                activity.getSharedPreferences(SYS_PREFS, MODE_PRIVATE).edit()
+                        .putInt("lastStartVer", 0).apply();
+                cancel(true);
+                activity.startActivity(new Intent(activity, LoadActivity.class));
+                activity.finish();
+            });
 
             progressBar.setIndeterminate(true);
             textView.setText(R.string.load_preparing);
@@ -190,7 +232,7 @@ public class LoadActivity extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            Toast.makeText(wr.get(), R.string.load_fatal_err, Toast.LENGTH_LONG).show();
+//            Toast.makeText(wr.get(), R.string.load_fatal_err, Toast.LENGTH_LONG).show();
             wr.get().finish();
         }
 
@@ -203,11 +245,14 @@ public class LoadActivity extends AppCompatActivity {
                 publishProgress(CODE_DL, i, Parser.FILES_COUNT, i);
                 parser.prepare(i);
             }
+            if (isCancelled()) return null;
 
             TDolls list;
             try {
                 list = parser.getList();
                 for (int i = 0; i < list.size(); i++) {
+                    if (isCancelled()) return null;
+
                     TDoll doll = list.get(i);
                     publishProgress(CODE_PARSING, i, list.size(), 0);
                     try {

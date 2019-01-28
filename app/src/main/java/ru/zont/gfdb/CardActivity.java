@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -106,7 +107,6 @@ public class CardActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-                Log.d(LOG, "Starting AsyncTask");
                 parser1 = new Lvl1Parser(this);
                 parser1.execute(id);
             });
@@ -246,7 +246,9 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(Integer... args) {
-            TDoll doll = DollCaching.getDoll(args[0]);
+            TDoll doll = PreferenceManager.getDefaultSharedPreferences(wr.get())
+                    .getBoolean("doll_cache", true)
+                            ? DollCaching.getDoll(args[0]) : null;
             if (doll == null)
                 doll = LoadActivity.getCachedList(wr.get()).getById(args[0]);
             return doll;
@@ -327,7 +329,7 @@ public class CardActivity extends AppCompatActivity {
         protected TDoll doInBackground(TDoll... tDolls) {
             if (tDolls[0].getParsingLevel() >= 2) return tDolls[0];
 
-            String server = wr.get().getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE)
+            String server = PreferenceManager.getDefaultSharedPreferences(wr.get())
                     .getString("server", "EN");
             Parser parser = new Parser(wr.get().getCacheDir(), server);
             try {
@@ -337,7 +339,9 @@ public class CardActivity extends AppCompatActivity {
                 return null;
             }
 
-            DollCaching.cacheDoll(tDolls[0]);
+            if (PreferenceManager.getDefaultSharedPreferences(wr.get())
+                    .getBoolean("doll_cache", true))
+                DollCaching.cacheDoll(tDolls[0]);
             return tDolls[0];
         }
 

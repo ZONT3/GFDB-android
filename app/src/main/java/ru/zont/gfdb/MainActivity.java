@@ -3,6 +3,7 @@ package ru.zont.gfdb;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,14 +19,20 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static String gameServer;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        gameServer = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("server", "EN");
 
         Toolbar toolbar = findViewById(R.id.main_tb);
         setSupportActionBar(toolbar);
@@ -63,16 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 reloadDB();
                 return true;
             case R.id.main_menu_settings:
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.load_selectserv)
-                        .setItems(R.array.servers, (dialog, which) -> {
-                            getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE).edit()
-                                    .putString("server", getResources()
-                                            .getStringArray(R.array.servers_values)[which])
-                                    .apply();
-                            reloadDB();
-                        })
-                        .create().show();
+                startActivity(new Intent(this, PreferencesActivity.class));
                 return true;
             default: return super.onOptionsItemSelected(item);
         }
@@ -86,5 +85,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void gotoLib(View v) {
         startActivity(new Intent(MainActivity.this, LibraryActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (gameServer != null &&
+                !Objects.equals(PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("server", "EN"), gameServer)) {
+            Toast.makeText(this, R.string.main_prefsChangedReloading, Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, LoadActivity.class));
+            finish();
+        }
     }
 }

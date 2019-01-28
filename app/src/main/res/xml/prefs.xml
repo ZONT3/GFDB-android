@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:entries="@array/servers"
+        android:entryValues="@array/servers_values"
+        android:key="server"
+        android:title="Game Server" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="doll_cache"
+        android:summary="T-Dolls will be downloaded only once per session. Not recommended with unstable animations"
+        android:title="Save parsed T-Dolls to cache" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="anim"
+        android:summary="Activity transition animations in library. On some devices may cause wrong content displaying."
+        android:title="Unstable animations" />
+</PreferenceScreen>
