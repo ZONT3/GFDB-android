@@ -571,6 +571,7 @@ public class CardActivity extends AppCompatActivity {
                             switch (which) {
                                 case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGamepress().toString()))); break;
                                 case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getFws().toString()))); break;
+                                case 2: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getWiki().toString()))); break;
                             }
                         }).create().show();
                 return true;

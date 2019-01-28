@@ -8,7 +8,9 @@ import com.google.gson.stream.JsonReader;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.jsoup.select.NodeFilter;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -23,7 +25,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Parser {
-    public static final int FILES_COUNT = 4;
+    public static final int FILES_COUNT = 5;
     @SuppressWarnings("WeakerAccess")
     public static final int LIST_GP = 0;
     @SuppressWarnings("WeakerAccess")
@@ -32,6 +34,10 @@ public class Parser {
     public static final int STATS_GP = 2;
     @SuppressWarnings("WeakerAccess")
     public static final int STATS_FWS = 3;
+    @SuppressWarnings("WeakerAccess")
+    public static final int LIST_WIKI = 4;
+    @SuppressWarnings("WeakerAccess")
+    public static final int CRAFTLIST_WIKI = 5;
 
     private String gameServer;
 
@@ -39,12 +45,16 @@ public class Parser {
     private File gpStatFile;
     private File fwsListFile;
     private File fwsStatFile;
+    private File wikiListFile;
+    private File wikiCraftlistFile;
 
     private boolean preparsed = false;
     private ArrayList<HashMap<String, String>> listGP;
     private ArrayList<HashMap<String, String>> statsGP;
     private Elements listFWS;
     private Elements statsFWS;
+    private Elements listWiki;
+    private Elements craftlistWiki;
 
     public Parser(File cacheDir, String server, boolean clearCache) {
         gameServer = server;
@@ -53,12 +63,16 @@ public class Parser {
         gpStatFile = new File(cacheDir, "stats_gamepress.json");
         fwsListFile = new File(cacheDir, "list_gffws.html");
         fwsStatFile = new File(cacheDir, "stats_gffws.html");
+        wikiListFile = new File(cacheDir, "list_wiki.html");
+        wikiCraftlistFile = new File(cacheDir, "caftlist_wiki.html");
 
         if (clearCache) {
             gpListFile.delete();
             gpStatFile.delete();
             fwsListFile.delete();
             fwsStatFile.delete();
+            wikiListFile.delete();
+            wikiCraftlistFile.delete();
         }
     }
 
@@ -86,6 +100,14 @@ public class Parser {
                     f = fwsStatFile;
                     url = new URL("https://gf.fws.tw/db/guns/table_list");
                     break;
+                case LIST_WIKI:
+                    f = wikiListFile;
+                    url = new URL("https://en.gfwiki.com/wiki/T-Doll_Index");
+                    break;
+                case CRAFTLIST_WIKI:
+                    f = wikiListFile;
+                    url = new URL("https://en.gfwiki.com/wiki/T-Doll_Production");
+                    break;
                 default:
                     return;
             }
@@ -111,6 +133,12 @@ public class Parser {
                 .getElementsByAttributeValue("id", "datatable").first()
                 .getElementsByTag("tbody").first()
                 .getElementsByTag("tr");
+        listWiki = Jsoup.parse(wikiListFile, "UTF-8").body()
+                .getElementsByClass("card-bg-small");
+        craftlistWiki = Jsoup.parse(wikiCraftlistFile, "UTF-8").body()
+                .getElementsByClass("gf-table").first()
+                .getElementsByTag("tbody").first()
+                .getElementsByTag("a");
         preparsed = true;
     }
 
@@ -185,6 +213,7 @@ public class Parser {
             if (Objects.equals(e.get("id"), doll.id + ""))
                 entry = e;
         if (entry == null) throw new ParserException("ID not found in the list");
+
         Element fwsEntry = null;
         for (Element e : listFWS) {
             try {
@@ -196,7 +225,19 @@ public class Parser {
                 }
             } catch (Exception ignored) {}
         }
-        if (fwsEntry == null) Log.w("PARSER", String.format("%s FWS ENTRY HAS NOT FOUND!", doll.toString()));
+        if (fwsEntry == null) Log.w("PARSER", String.format("%d FWS ENTRY HAS NOT FOUND!", doll.getId()));
+
+        for (Element e : listWiki) {
+            try {
+                if (Integer.parseInt(e.getElementsByTag("span").get(1)
+                        .text().split("&")[0]) == doll.id) {
+                    doll.wiki = new URL("https://en.gfwiki.com" +
+                            e.getElementsByTag("a").first().attr("href"));
+                }
+            } catch (Throwable ignored) { }
+        }
+        if (doll.wiki == null) Log.w("PARSER", String.format("%d WIKI ENTRY HAS NOT FOUND!", doll.getId()));
+
         try {
             if (fwsEntry != null) doll.thumb = new URL("http://gf.fws.tw"
                     + fwsEntry.getElementsByAttributeValueContaining("style", "background-image: url(")
@@ -243,6 +284,7 @@ public class Parser {
             } catch (Exception ignored) { }
         }
         if (entry == null) throw new ParserException("Entry in alist has not found");
+
         Element tableEntry = null;
         for (Element e : statsFWS) {
             try {
@@ -255,6 +297,17 @@ public class Parser {
             } catch (Exception ignored) { }
         }
         if (tableEntry == null) throw new ParserException("Entry in table has not found");
+
+        for (Element e : listWiki) {
+            try {
+                if (Integer.parseInt(e.getElementsByTag("span").get(1)
+                        .text().split("&")[0]) == doll.id) {
+                    doll.wiki = new URL("https://en.gfwiki.com" +
+                            e.getElementsByTag("a").first().attr("href"));
+                }
+            } catch (Throwable ignored) { }
+        }
+        if (doll.wiki == null) Log.w("PARSER", String.format("%d WIKI ENTRY HAS NOT FOUND!", doll.getId()));
 
         try {
             Elements td = tableEntry.getElementsByTag("td");
@@ -394,6 +447,21 @@ public class Parser {
                         + e.attr("src"));
             doll.skills = skills.toString();
         } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = ""; }
+
+        try {
+            if (!doll.craft.equals("Unbuildable")) {
+                //TODO Ага, вот этот парсинг
+            }
+        } catch (Exception pe) {
+            exceptions.add(new ParserException(doll, "Craft minimum reqs", pe));
+
+        }
+
+        /* Макет блока парсинга
+        try {
+
+        } catch (Exception pe) { exceptions.add(new ParserException(doll, "", pe)); }
+        */
     }
 
     private static void fullParseTW(TDoll doll, ArrayList<ParserException> exceptions) throws ParserException {

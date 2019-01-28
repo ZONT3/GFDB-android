@@ -20,11 +20,11 @@
 
     <ImageButton
         android:id="@+id/main_bt_lib"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:layout_marginTop="32dp"
         android:contentDescription="@string/main_library"
-        android:onClick="gotoLib"
+        android:onClick="mGoto"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_tb"
@@ -41,6 +41,31 @@
         app:layout_constraintBottom_toBottomOf="@+id/main_bt_lib"
         app:layout_constraintEnd_toEndOf="@+id/main_bt_lib"
         app:layout_constraintStart_toStartOf="@+id/main_bt_lib" />
+
+    <ImageButton
+        android:id="@+id/main_bt_craft"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/main_library"
+        android:onClick="mGoto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_tw_lib"
+        app:srcCompat="@drawable/factory" />
+
+    <TextView
+        android:id="@+id/main_tw_craft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/main_craft"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Button"
+        app:layout_constraintBottom_toBottomOf="@+id/main_bt_craft"
+        app:layout_constraintEnd_toEndOf="@+id/main_bt_craft"
+        app:layout_constraintStart_toStartOf="@+id/main_bt_craft" />
 
     <TextView
         android:id="@+id/main_ver"

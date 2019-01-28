@@ -13,9 +13,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity android:name=".CraftActivity"></activity>
         <activity
             android:name=".PreferencesActivity"
-            android:label="@string/prefs_title"/>
+            android:label="@string/prefs_title" />
         <activity
             android:name=".LoadActivity"
             android:theme="@style/AppTheme.Launcher">
@@ -31,8 +32,8 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".LibraryActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/main_library"/>
+            android:label="@string/main_library"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".CardActivity" />
     </application>
 

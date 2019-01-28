@@ -212,7 +212,11 @@ public class LoadActivity extends AppCompatActivity {
                     if (progressBar.getMax() != arg2) progressBar.setMax(arg2);
                     progressBar.setProgress(arg1);
                     textView.setText(R.string.load_dl);
-                    ex.setText(new int[] {R.string.load_gplist, R.string.load_fwslist, R.string.load_gpstat, R.string.load_fwsstat}[arg3]);
+                    ex.setText(new int[] {
+                            R.string.load_gplist, R.string.load_fwslist,
+                            R.string.load_gpstat, R.string.load_fwsstat,
+                            R.string.load_wiki, R.string.load_craftwiki
+                    }[arg3]);
                     break;
                 case CODE_PARSING:
                     if (progressBar.isIndeterminate()) progressBar.setIndeterminate(false);

@@ -83,8 +83,15 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void gotoLib(View v) {
-        startActivity(new Intent(MainActivity.this, LibraryActivity.class));
+    public void mGoto(View v) {
+        switch (v.getId()) {
+            case R.id.main_bt_lib:
+                startActivity(new Intent(MainActivity.this, LibraryActivity.class));
+                break;
+            case R.id.main_bt_craft:
+                startActivity(new Intent(MainActivity.this, CraftActivity.class));
+                break;
+        }
     }
 
     @Override

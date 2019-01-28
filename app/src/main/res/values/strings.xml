@@ -51,10 +51,14 @@
     <string name="prefs_title">Preferences</string>
     <string name="load_cleardata">Clear all data</string>
     <string name="load_selectedserver">Server: %s</string>
+    <string name="main_craft">Craft Calculator</string>
+    <string name="load_wiki">Wiki dolls index</string>
+    <string name="load_craftwiki">Wiki craft index</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>
         <item>Taiwan version (gf.fws.tw)</item>
+        <item>Wiki</item>
     </array>
     <array name="lib_sort_arr">
         <item>No.</item>

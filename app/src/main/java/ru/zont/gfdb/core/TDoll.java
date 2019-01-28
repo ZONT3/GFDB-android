@@ -31,7 +31,7 @@ public class TDoll implements Serializable {
     URL thumb;
     URL gamepress;
     URL fws;
-//    URL wiki;
+    URL wiki;
 
     // ---------------------- LEVEL 2 PARSING
     URL cgMain;
@@ -48,18 +48,26 @@ public class TDoll implements Serializable {
     String buffs;
     String skills;
 
+    int craftMinMan;
+    int craftMinAmmo;
+    int craftMinRation;
+    int craftMinParts;
+
     TDoll(int id) { this.id = id; }
 
     public int getParsingLevel() { return parsingLevel; }
 
     public int getId() { return id; }
 
+    @NonNull
     public String getName() { return name; }
 
     public int getRarity() { return rarity; }
 
+    @NonNull
     public String getType() { return type; }
 
+    @NonNull
     public String getCraft() { return craft; }
 
     public int getCraftMins() {
@@ -118,7 +126,7 @@ public class TDoll implements Serializable {
 
     public URL getFws() { return fws; }
     
-//    public URL getWiki() { return wiki; }
+    public URL getWiki() { return wiki; }
 
     @Override
     public boolean equals(Object obj) {
