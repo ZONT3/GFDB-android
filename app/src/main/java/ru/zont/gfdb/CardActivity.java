@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,6 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import ru.zont.gfdb.core.Dimension;
+import ru.zont.gfdb.core.DollCaching;
 import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
 
@@ -65,7 +67,8 @@ public class CardActivity extends AppCompatActivity {
     private ViewGroup content;
     private ViewGroup loadView;
     private ViewPager viewPager;
-    private View toTransist;
+    private View toTransit;
+    private ViewGroup root;
 
     private TDoll doll;
 
@@ -84,7 +87,34 @@ public class CardActivity extends AppCompatActivity {
         supportActionBar.setDisplayShowHomeEnabled(true);
         supportActionBar.setDisplayHomeAsUpEnabled(true);
 
-        toTransist = null;
+        setupTransition();
+        init();
+    }
+
+    private void init() {
+        int id = getIntent().getIntExtra("id", -1);
+        if (id < 0) {
+            Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
+            finishAfterTransition();
+        }
+
+        new Thread(() -> {
+            if (!isTabless) {
+                try {
+                    while (!(mfReady && cgfReady)) Thread.sleep(100);
+                } catch (InterruptedException ignored) { }
+            }
+
+            runOnUiThread(() -> {
+                Log.d(LOG, "Starting AsyncTask");
+                parser1 = new Lvl1Parser(this);
+                parser1.execute(id);
+            });
+        }).start();
+    }
+
+    private void setupTransition() {
+        toTransit = null;
         if (!(isTabless = getResources().getBoolean(R.bool.card_tabless))) {
             viewPager = findViewById(R.id.card_viewpager);
             viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -109,30 +139,40 @@ public class CardActivity extends AppCompatActivity {
                     return new String[]{getString(R.string.card_info), getString(R.string.card_cgs)}[position];
                 }
             });
-            toTransist = viewPager;
+            toTransit = viewPager;
         } else onCreateMainFragment(null);
-        if (toTransist == null) toTransist = findViewById(R.id.card_toTranslate);
-        toTransist.setTransitionName(TN_CONTENT);
+        if (toTransit == null) toTransit = findViewById(R.id.card_toTransit);
+        toTransit.setTransitionName(TN_CONTENT);
 
-        int id = getIntent().getIntExtra("id", -1);
-        if (id < 0) {
-            Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
-            finishAfterTransition();
-        }
+        root = findViewById(R.id.card_root);
+        getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) { }
 
-        new Thread(() -> {
-            if (!isTabless) {
-                try {
-                    while (!(mfReady && cgfReady)) Thread.sleep(100);
-                } catch (InterruptedException ignored) { }
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                root.setVisibility(View.GONE); // <=============== Костыли. Убрать нахуй.
+                Thread thread = new Thread(() -> {
+                    try {
+                        Thread.sleep(5);
+                        runOnUiThread(() -> root.setVisibility(View.VISIBLE));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+                thread.setPriority(Thread.MAX_PRIORITY);
+                thread.start();
             }
 
-            runOnUiThread(() -> {
-                Log.d(LOG, "Starting AsyncTask");
-                parser1 = new Lvl1Parser(this);
-                parser1.execute(id);
-            });
-        }).start();
+            @Override
+            public void onTransitionCancel(Transition transition) { }
+
+            @Override
+            public void onTransitionPause(Transition transition) { }
+
+            @Override
+            public void onTransitionResume(Transition transition) { }
+        });
     }
 
     public static class MainFragment extends Fragment {
@@ -206,7 +246,10 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(Integer... args) {
-            return LoadActivity.getCachedList(wr.get()).getById(args[0]);
+            TDoll doll = DollCaching.getDoll(args[0]);
+            if (doll == null)
+                doll = LoadActivity.getCachedList(wr.get()).getById(args[0]);
+            return doll;
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -282,6 +325,8 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(TDoll... tDolls) {
+            if (tDolls[0].getParsingLevel() >= 2) return tDolls[0];
+
             String server = wr.get().getSharedPreferences("ru.zont.gfdb.prefs", MODE_PRIVATE)
                     .getString("server", "EN");
             Parser parser = new Parser(wr.get().getCacheDir(), server);
@@ -291,6 +336,8 @@ public class CardActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return null;
             }
+
+            DollCaching.cacheDoll(tDolls[0]);
             return tDolls[0];
         }
 
@@ -305,7 +352,7 @@ public class CardActivity extends AppCompatActivity {
                 return;
             }
 
-            if (exceptions.size() > 0) {
+            if (exceptions != null && exceptions.size() > 0) {
                 Snackbar.make(wr.get().findViewById(R.id.card_root), wr.get().getString(R.string.card_parserr), Snackbar.LENGTH_LONG)
                         .setAction(R.string.card_parserr_details, v -> {
                             StringBuilder sb1 = new StringBuilder();
@@ -394,7 +441,7 @@ public class CardActivity extends AppCompatActivity {
             cardActivity.content.startAnimation(AnimationUtils.loadAnimation(cardActivity, R.anim.fadein));
             cardActivity.loadView.setVisibility(View.GONE);
             cardActivity.content.setVisibility(View.VISIBLE);
-            if (cardActivity.toTransist != null) cardActivity.toTransist.setTransitionName(null);
+            if (cardActivity.toTransit != null) cardActivity.toTransit.setTransitionName(null);
             if (cg != null) cg.setTransitionName(TN_CONTENT);
         }
 
@@ -495,7 +542,19 @@ public class CardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finishAfterTransition();
+        if (viewPager != null && viewPager.getCurrentItem() != 0) {
+            viewPager.setCurrentItem(0, true);
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(80);
+                    runOnUiThread(this::finishAfterTransition);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.setPriority(Thread.MAX_PRIORITY);
+            thread.start();
+        } else finishAfterTransition();
     }
 
     @Override

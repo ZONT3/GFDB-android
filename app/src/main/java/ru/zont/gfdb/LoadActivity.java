@@ -82,17 +82,33 @@ public class LoadActivity extends AppCompatActivity {
         }
 
         SharedPreferences sysPrefs = getSharedPreferences("ru.zont.gfdb.sys", MODE_PRIVATE);
-        if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE)
+        //noinspection ConstantConditions
+        if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE
+                || BuildConfig.VERSION_NAME.contains("-EX")) {
             upd = true;
+            Toast.makeText(this, R.string.load_reload, Toast.LENGTH_SHORT).show();
+        }
         sysPrefs.edit().putInt("lastStartVer", BuildConfig.VERSION_CODE).apply();
 
+        //noinspection ConstantConditions
         if (!upd) {
             startActivity(new Intent(this, MainActivity.class)
                     .putExtra("upd", false));
             finish();
         } else {
             dateFile.delete();
-            new LoadList(this).execute();
+            //noinspection ConstantConditions
+            if (BuildConfig.VERSION_NAME.contains("-EX")) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.load_clearCache)
+                        .setPositiveButton(R.string.yes, (i1, i2) -> {
+                            for (File f : getCacheDir().listFiles())
+                                if (!f.isDirectory()) f.delete();
+                            new LoadList(this).execute();
+                        })
+                        .setNegativeButton(R.string.no, (i1, i2) -> new LoadList(this).execute())
+                        .create().show();
+            } else new LoadList(this).execute();
         }
     }
 

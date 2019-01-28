@@ -50,6 +50,8 @@ public class TDoll implements Serializable {
 
     TDoll(int id) { this.id = id; }
 
+    public int getParsingLevel() { return parsingLevel; }
+
     public int getId() { return id; }
 
     public String getName() { return name; }

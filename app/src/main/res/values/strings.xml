@@ -43,6 +43,10 @@
     <string name="load_selectserv">Select game server</string>
     <string name="prefs_server">Game Server</string>
     <string name="card_affects" translatable="false">Affects</string>
+    <string name="load_reload">Reloading database due to app update or experimental version</string>
+    <string name="load_clearCache">Would you like to clear cache?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>

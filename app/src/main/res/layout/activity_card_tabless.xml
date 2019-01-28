@@ -50,7 +50,7 @@
             android:visibility="visible" />
 
         <include
-            android:id="@+id/card_toTranslate"
+            android:id="@+id/card_toTransit"
             layout="@layout/fragment_card_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
