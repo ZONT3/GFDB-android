@@ -54,6 +54,12 @@
     <string name="main_craft">Craft Calculator</string>
     <string name="load_wiki">Wiki dolls index</string>
     <string name="load_craftwiki">Wiki craft index</string>
+    <string name="craft_chances">Chances to craft at least one:</string>
+    <string name="craft_constype_normal">Normal Construction</string>
+    <string name="craft_constype_large1">Heavy Low Tier</string>
+    <string name="craft_constype_large2">Heavy Medium Tier</string>
+    <string name="craft_constype_large3">Heavy High Tier</string>
+    <string name="craft_tries">Tries</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>

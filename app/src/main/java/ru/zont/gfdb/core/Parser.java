@@ -304,7 +304,7 @@ public class Parser {
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
                             doll.reccraftLarge = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else {
+                        } else if (td.nextElementSibling() != null) {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
                             doll.reccraftLarge = String.format("%1$d/%1$d/%1$d/%1$d", val);
@@ -320,6 +320,7 @@ public class Parser {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void baseParseTW(TDoll doll) throws ParserException {
         Element entry = null;
         for (Element e : listFWS) {
@@ -554,7 +555,7 @@ public class Parser {
         try {
 
         } catch (Exception pe) { exceptions.add(new ParserException(doll, "", pe)); }
-        */
+        Здесь могла быть ваша реклама */
     }
 
     private static void fullParseTW(TDoll doll, ArrayList<ParserException> exceptions) throws ParserException {
