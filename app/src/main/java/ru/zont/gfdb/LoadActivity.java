@@ -1,7 +1,6 @@
 package ru.zont.gfdb;
 
 import android.annotation.SuppressLint;
-import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -247,7 +246,7 @@ public class LoadActivity extends AppCompatActivity {
             Parser parser = new Parser(activity.getCacheDir(), activity.gameServer, true);
             for (int i = 0; i < Parser.FILES_COUNT; i++) {
                 publishProgress(CODE_DL, i, Parser.FILES_COUNT, i);
-                parser.prepare(i);
+                parser.download(i);
             }
             if (isCancelled()) return null;
 

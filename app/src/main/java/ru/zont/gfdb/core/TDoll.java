@@ -2,6 +2,7 @@ package ru.zont.gfdb.core;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -48,10 +49,10 @@ public class TDoll implements Serializable {
     String buffs;
     String skills;
 
-    int craftMinMan;
-    int craftMinAmmo;
-    int craftMinRation;
-    int craftMinParts;
+    @Nullable
+    String reccraft;
+    @Nullable
+    String reccraftLarge;
 
     TDoll(int id) { this.id = id; }
 

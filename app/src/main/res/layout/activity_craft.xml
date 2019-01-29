@@ -17,4 +17,96 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:title="@string/main_craft" />
+
+    <ImageView
+        android:id="@+id/craft_iw"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_mp"
+        app:layout_constraintStart_toStartOf="@+id/craft_mp"
+        app:layout_constraintTop_toBottomOf="@+id/craft_tb"
+        app:srcCompat="@drawable/manpower" />
+
+    <ImageView
+        android:id="@+id/craft_iw2"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_ammo"
+        app:layout_constraintStart_toStartOf="@+id/craft_ammo"
+        app:layout_constraintTop_toBottomOf="@+id/craft_tb"
+        app:srcCompat="@drawable/ammo" />
+
+    <ImageView
+        android:id="@+id/craft_iw3"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_rat"
+        app:layout_constraintStart_toStartOf="@+id/craft_rat"
+        app:layout_constraintTop_toBottomOf="@+id/craft_tb"
+        app:srcCompat="@drawable/ration" />
+
+    <ImageView
+        android:id="@+id/craft_iw4"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_rat2"
+        app:layout_constraintStart_toStartOf="@+id/craft_rat2"
+        app:layout_constraintTop_toBottomOf="@+id/craft_tb"
+        app:srcCompat="@drawable/parts" />
+
+    <NumberPicker
+        android:id="@+id/craft_mp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/craft_ammo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw" />
+
+    <NumberPicker
+        android:id="@+id/craft_ammo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/craft_rat"
+        app:layout_constraintStart_toEndOf="@+id/craft_mp"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw2" />
+
+    <NumberPicker
+        android:id="@+id/craft_rat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/craft_rat2"
+        app:layout_constraintStart_toEndOf="@+id/craft_ammo"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw3" />
+
+    <NumberPicker
+        android:id="@+id/craft_rat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/craft_rat"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw4" />
+
+    <Button
+        android:id="@+id/craft_bt_set"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="Select doll"
+        app:layout_constraintEnd_toStartOf="@+id/craft_bt_get"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/craft_ammo" />
+
+    <Button
+        android:id="@+id/craft_bt_get"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="Droplist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/craft_bt_set"
+        app:layout_constraintTop_toBottomOf="@+id/craft_rat" />
 </android.support.constraint.ConstraintLayout>
