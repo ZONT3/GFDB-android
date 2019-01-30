@@ -180,7 +180,7 @@ public class NetParser {
                     doll.gamepress = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
                     doll.type = entry.get("tdoll_class");
                     doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", "").replace("ex", "6"));
-                    doll.craft = entry.get("field_t_doll_craft_time"); if (doll.craft.isEmpty()) doll.craft = "Unbuildable";
+                    doll.craftTime = entry.get("field_t_doll_craft_time"); if (doll.craftTime.isEmpty()) doll.craftTime = "Unbuildable";
                     doll.acc = Integer.parseInt(entry.get("acc"));
                     doll.dmg = Integer.parseInt(entry.get("dmg"));
                     doll.eva = Integer.parseInt(entry.get("eva"));

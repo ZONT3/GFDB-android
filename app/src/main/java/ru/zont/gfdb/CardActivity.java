@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,6 +49,7 @@ import ru.zont.gfdb.core.Dimension;
 import ru.zont.gfdb.core.DollCaching;
 import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
+import ru.zont.gfdb.core.TDolls;
 
 public class CardActivity extends AppCompatActivity {
     private static final String[] RARITY_TABLE = {"", "", "★★", "★★★", "★★★★", "★★★★★", "EXTRA"};
@@ -142,7 +142,9 @@ public class CardActivity extends AppCompatActivity {
             toTransit = viewPager;
         } else onCreateMainFragment(null);
         if (toTransit == null) toTransit = findViewById(R.id.card_toTransit);
-        toTransit.setTransitionName(TN_CONTENT);
+        if (PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("anim", false))
+            toTransit.setTransitionName(TN_CONTENT);
 
         root = findViewById(R.id.card_root);
         getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
@@ -238,7 +240,8 @@ public class CardActivity extends AppCompatActivity {
     */
 
     private static class Lvl1Parser extends AsyncTask<Integer, Void, TDoll> {
-        WeakReference<CardActivity> wr;
+        private WeakReference<CardActivity> wr;
+        private Parser.ParserException error;
 
         Lvl1Parser(CardActivity activity) {
             wr = new WeakReference<>(activity);
@@ -246,12 +249,33 @@ public class CardActivity extends AppCompatActivity {
 
         @Override
         protected TDoll doInBackground(Integer... args) {
+            Integer id = args[0];
             TDoll doll = PreferenceManager.getDefaultSharedPreferences(wr.get())
                     .getBoolean("doll_cache", true)
-                            ? DollCaching.getDoll(args[0]) : null;
-            if (doll == null)
-                doll = LoadActivity.getCachedList(wr.get()).getById(args[0]);
+                            ? DollCaching.getDoll(id) : null;
+            if (doll == null) {
+                try {
+                    TDolls list = Parser.getCachedList(wr.get());
+                    doll = list.getById(id);
+                } catch (Parser.ParserException e) {
+                    e.printStackTrace();
+                    error = e;
+                    cancel(true);
+                }
+            }
             return doll;
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (error!=null && error.getMessage().equals("List has not found in cache")) {
+                Toast.makeText(wr.get(), R.string.cacheloadfail, Toast.LENGTH_LONG).show();
+                wr.get().startActivity(new Intent(wr.get(), LoadActivity.class));
+                wr.get().finish();
+            } else if (error!=null) {
+                Toast.makeText(wr.get(), R.string.dberr, Toast.LENGTH_LONG).show();
+                wr.get().finish();
+            }
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -302,7 +326,7 @@ public class CardActivity extends AppCompatActivity {
             }
 
             roles.setText("");
-            build.setText(tDoll.getCraft());
+            build.setText(tDoll.getCraftTime());
             hp.setText(tDoll.getHp()+"");
             dmg.setText(tDoll.getDmg()+"");
             acc.setText(tDoll.getAcc()+"");
@@ -443,8 +467,12 @@ public class CardActivity extends AppCompatActivity {
 
             CardActivity cardActivity = wr.get();
             cardActivity.content.startAnimation(AnimationUtils.loadAnimation(cardActivity, R.anim.fadein));
-            cardActivity.loadView.setVisibility(View.GONE);
+            cardActivity.loadView.startAnimation(AnimationUtils.loadAnimation(cardActivity, R.anim.fadeout));
             cardActivity.content.setVisibility(View.VISIBLE);
+            cardActivity.loadView.postOnAnimation(() -> {
+                cardActivity.loadView.setVisibility(View.GONE);
+                cardActivity.loadView.setAlpha(1);
+            });
             if (cardActivity.toTransit != null) cardActivity.toTransit.setTransitionName(null);
             if (cg != null) cg.setTransitionName(TN_CONTENT);
         }

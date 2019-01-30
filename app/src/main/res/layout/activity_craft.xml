@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CraftActivity">
@@ -19,8 +20,10 @@
         app:title="@string/main_craft" />
 
     <ScrollView
+        android:id="@+id/craft_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,6 +79,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:nextFocusForward="@id/craft_ammo"
+
                     app:layout_constraintEnd_toStartOf="@+id/craft_ammo"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/craft_iw" />
@@ -86,6 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:nextFocusForward="@id/craft_rat"
                     app:layout_constraintEnd_toStartOf="@+id/craft_rat"
                     app:layout_constraintStart_toEndOf="@+id/craft_mp"
                     app:layout_constraintTop_toBottomOf="@+id/craft_iw2" />
@@ -96,6 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:nextFocusForward="@id/craft_parts"
                     app:layout_constraintEnd_toStartOf="@+id/craft_parts"
                     app:layout_constraintStart_toEndOf="@+id/craft_ammo"
                     app:layout_constraintTop_toBottomOf="@+id/craft_iw3" />
@@ -114,6 +121,7 @@
                     android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:onClick="gotoLib"
                     android:text="Select doll"
                     app:layout_constraintEnd_toStartOf="@+id/craft_bt_get"
                     app:layout_constraintStart_toStartOf="parent"
@@ -124,6 +132,7 @@
                     android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:onClick="gotoLib"
                     android:text="Droplist"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/craft_bt_set"
@@ -146,11 +155,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="@string/craft_constype_normal"
                     android:textAlignment="center"
                     app:layout_constraintEnd_toEndOf="@+id/craft_lc"
                     app:layout_constraintStart_toStartOf="@+id/craft_lc"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_lc"
-                    android:text="@string/craft_constype_normal" />
+                    app:layout_constraintTop_toBottomOf="@+id/craft_lc" />
 
                 <View
                     android:id="@+id/divider3"
@@ -184,15 +193,6 @@
                     app:layout_constraintStart_toEndOf="@+id/space"
                     app:layout_constraintTop_toTopOf="@+id/craft_tries" />
 
-                <Space
-                    android:id="@+id/space"
-                    android:layout_width="1dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/divider3" />
-
                 <TextView
                     android:id="@+id/craft_cost"
                     android:layout_width="wrap_content"
@@ -214,16 +214,111 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
+                    android:text="@string/craft_chances"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_cost"
-                    android:text="@string/craft_chances" />
+                    app:layout_constraintTop_toBottomOf="@+id/craft_cost" />
+
+                <Space
+                    android:id="@+id/space"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/divider3" />
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/craft_craftable_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/craft_chances">
+
+                    <ProgressBar
+                        android:id="@+id/craft_craftable_pb"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/craft_craftable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body2"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Can produce: HG, AR, SMG, RF" />
+                </android.support.constraint.ConstraintLayout>
+
             </android.support.constraint.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/craft_loading"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/craft_tb">
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/card_downloading"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12">
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+            <ProgressBar
+                android:id="@+id/progressBar2"
+                style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
 
 </android.support.constraint.ConstraintLayout>

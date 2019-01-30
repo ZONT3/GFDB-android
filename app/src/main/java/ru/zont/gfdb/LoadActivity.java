@@ -288,6 +288,7 @@ public class LoadActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Deprecated
     static TDolls getCachedList(AppCompatActivity activity) {
         File file = new File(activity.getCacheDir(), "cachedList");
         if (!file.exists()) {

@@ -60,6 +60,12 @@
     <string name="craft_constype_large2">Heavy Medium Tier</string>
     <string name="craft_constype_large3">Heavy High Tier</string>
     <string name="craft_tries">Tries</string>
+    <string name="cacheloadfail">Database was not loaded. If error repeats, try to reinstall app</string>
+    <string name="dberr">Error on loading database. Try to reinstall app</string>
+    <string name="craft_craftable">Can produce:</string>
+    <string name="craft_libtitle_droplist">Droplist</string>
+    <string name="craft_libtitle_select">Select target</string>
+    <string name="lib_tocraft_title">Select preferred craft type</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>
@@ -86,6 +92,10 @@
     <array name="servers_values">
         <item>EN</item>
         <item>TW</item>
+    </array>
+    <array name="lib_tocraft_options">
+        <item>Minimum cost recipe</item>
+        <item>Recommend for that type</item>
     </array>
 
 </resources>

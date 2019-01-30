@@ -15,7 +15,7 @@ public class TDoll implements Serializable {
     String name;
     int rarity;
     String type;
-    String craft;
+    String craftTime;
 
     int hp;
     int dmg;
@@ -50,9 +50,19 @@ public class TDoll implements Serializable {
     String skills;
 
     @Nullable
-    String reccraft;
+    String craftReqs;
     @Nullable
-    String reccraftLarge;
+    String heavyCraftReqs;
+
+    @Nullable
+    public String getCraftReqs() {
+        return craftReqs;
+    }
+
+    @Nullable
+    public String getHeavyCraftReqs() {
+        return heavyCraftReqs;
+    }
 
     TDoll(int id) { this.id = id; }
 
@@ -69,12 +79,12 @@ public class TDoll implements Serializable {
     public String getType() { return type; }
 
     @NonNull
-    public String getCraft() { return craft; }
+    public String getCraftTime() { return craftTime; }
 
-    public int getCraftMins() {
-        if (craft.equals("Unbuildable")) return Integer.MAX_VALUE;
-        return Integer.valueOf(craft.split(":")[0]) * 60
-                + Integer.valueOf(craft.split(":")[1]);
+    public int getCraftTimeMins() {
+        if (craftTime.equals("Unbuildable")) return Integer.MAX_VALUE;
+        return Integer.valueOf(craftTime.split(":")[0]) * 60
+                + Integer.valueOf(craftTime.split(":")[1]);
     }
 
     public int getHp() { return hp; }

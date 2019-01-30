@@ -63,6 +63,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     private String searchQuery = "";
     private int timeMins = -1;
+    private ArrayList<Filter> permFilters = new ArrayList<>();
 
     private static ArrayList<String> gto() {
         ArrayList<String> list = new ArrayList<>();
@@ -152,7 +153,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                         String.format("<font color=\"#%06X\">%s</font> %s",
                                 (0xFFFFFF & ResourcesCompat.getColor(itemView.getContext().getResources(), RARITY_TABLE[doll.getRarity()], null)),
                                 doll.getRarity() != 6 ? doll.getRarity()+"★" : "EX",
-                                doll.getCraft());
+                                doll.getCraftTime());
                 holder.mMeta.setText(Html.fromHtml(constr_builder));
                 break;
             case SORT_HP: statStr = "HP"; statval = doll.getHp(); statProgr = doll.getHpBar(); break;
@@ -262,7 +263,7 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
             switch (sort) {
                 case SORT_ID: return (reverse ? -1 : 1) * (o1.getId() - o2.getId());
                 case SORT_NAME: return  (reverse ? -1 : 1) * (o1.getName().compareTo(o2.getName()));
-                case SORT_CONSTR: return (reverse ? -1 : 1) * (o1.getCraftMins() - o2.getCraftMins());
+                case SORT_CONSTR: return (reverse ? -1 : 1) * (o1.getCraftTimeMins() - o2.getCraftTimeMins());
                 case SORT_RARITY: return (reverse ? -1 : 1) * (o2.getRarity() - o1.getRarity());
                 case SORT_TYPE: return (reverse ? -1 : 1) * (TYPES_ORDER.indexOf(o1.getType().toUpperCase()) - TYPES_ORDER.indexOf(o2.getType().toUpperCase()));
 
@@ -293,8 +294,14 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                 newList.remove(doll);
 
         if (timeMins > -1) for (TDoll doll : originalDataset)
-            if (doll.getCraftMins() != timeMins)
+            if (doll.getCraftTimeMins() != timeMins)
                 newList.remove(doll);
+
+        for (Filter f : permFilters) {
+            for (TDoll doll : originalDataset)
+                if (!f.checkDoll(doll))
+                    newList.remove(doll);
+        }
 
         modifyDataset(newList);
         checkList();
@@ -318,7 +325,9 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
 
     void resetList() {
         reverse = false;
-        modifyDataset((TDolls) originalDataset.clone());
+        searchQuery = "";
+        timeMins = -1;
+        filter();
     }
 
     void applySearchQuery(String query) {
@@ -331,14 +340,27 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
         filter();
     }
 
+    void addPermanentFilter(Filter filter) {
+        permFilters.add(filter);
+        filter();
+    }
+
     int getTimeFilter() { return timeMins; }
 
     boolean hasFilters() {
-        return originalDataset.size() != dataset.size();
+        return !(searchQuery.isEmpty() && timeMins < 0);
     }
 
     private void checkList() {
         nores.get().setVisibility(dataset.size() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    interface Filter {
+        /**
+         * @param doll T-Doll to be checked
+         * @return True if that doll passes the filter, false otherwise
+         */
+        boolean checkDoll(TDoll doll);
     }
 
 //    void onDestroy() {

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.transition.TransitionManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -19,10 +18,13 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 
+import ru.zont.gfdb.core.CraftRecipe;
 import ru.zont.gfdb.core.Dimension;
+import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.core.TDolls;
 
@@ -44,11 +46,17 @@ public class LibraryActivity extends AppCompatActivity {
 
         pb = findViewById(R.id.lib_pb);
 
+        if (getIntent().hasExtra("title"))
+            getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
+        if (getIntent().hasExtra("filter_craft"))
+            getSupportActionBar().setSubtitle(getIntent().getStringExtra("filter_craft"));
+
         new AdapterLinker(this).execute();
     }
 
     private static class AdapterLinker extends AsyncTask<Void, Void, TDolls> {
         private WeakReference<LibraryActivity> wr;
+        private Parser.ParserException error;
 
         AdapterLinker(LibraryActivity a) { wr = new WeakReference<>(a); }
 
@@ -63,12 +71,17 @@ public class LibraryActivity extends AppCompatActivity {
                         TDollLibAdapter adapter = (TDollLibAdapter) recyclerView.getAdapter();
                         if (adapter == null) return;
                         TDoll tDoll = adapter.getDataset().get(itemPosition);
-                        Intent intent = new Intent(wr.get(), CardActivity.class);
-                        intent.putExtra("id", tDoll.getId());
-                        if (PreferenceManager.getDefaultSharedPreferences(wr.get()).getBoolean("anim", false))
+
+                        if (!wr.get().getIntent().hasExtra("request")) {
+                            Intent intent = new Intent(wr.get(), CardActivity.class);
+                            intent.putExtra("id", tDoll.getId());
                             wr.get().startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(wr.get(), v, CardActivity.TN_CONTENT).toBundle());
-                        else wr.get().startActivity(intent);
+                        } else returnDoll(wr, tDoll.getId(), wr.get().getIntent().getIntExtra("request", -1));
                     }, tdolls);
+
+            if (wr.get().getIntent().getBooleanExtra("filter_buildable", false))
+                adapter.addPermanentFilter(doll -> doll.getCraftTimeMins() < Integer.MAX_VALUE);
+
             recyclerView.setAdapter(adapter);
 
             LibraryActivity libraryActivity = wr.get();
@@ -80,7 +93,32 @@ public class LibraryActivity extends AppCompatActivity {
 
         @Override
         protected TDolls doInBackground(Void... voids) {
-            return LoadActivity.getCachedList(wr.get());
+            TDolls result = null;
+            try {
+                result = Parser.getCachedList(wr.get());
+                Intent intent = wr.get().getIntent();
+                if (intent.hasExtra("filter_craft"))
+                    result = CraftRecipe.getCraftable(result,
+                            intent.getStringExtra("filter_craft"),
+                            intent.getIntExtra("filter_craftType", -1));
+            } catch (Parser.ParserException e) {
+                e.printStackTrace();
+                error = e;
+                cancel(true);
+            }
+            return result;
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (error!=null && error.getMessage().equals("List has not found in cache")) {
+                Toast.makeText(wr.get(), R.string.cacheloadfail, Toast.LENGTH_LONG).show();
+                wr.get().startActivity(new Intent(wr.get(), LoadActivity.class));
+                wr.get().finish();
+            } else if (error!=null) {
+                Toast.makeText(wr.get(), R.string.dberr, Toast.LENGTH_LONG).show();
+                wr.get().finish();
+            }
         }
     }
 
@@ -192,6 +230,30 @@ public class LibraryActivity extends AppCompatActivity {
                     }
                     return true;
                 } else return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private static void returnDoll(WeakReference<LibraryActivity> wr, int id, int request) {
+        LibraryActivity activity = wr.get();
+        Intent intent = new Intent();
+        intent.putExtra("id", id);
+        switch (request) {
+            case CraftActivity.REQUEST_SETDOLL:
+                new AlertDialog.Builder(activity)
+                        .setTitle(R.string.lib_tocraft_title)
+                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
+                            intent.putExtra("option", which);
+                            activity.setResult(AppCompatActivity.RESULT_OK, intent);
+                            activity.finish();
+                        })
+                        .setCancelable(true)
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .create().show();
+                break;
+            default:
+                activity.setResult(AppCompatActivity.RESULT_CANCELED, intent);
+                activity.finish();
+                break;
         }
     }
 

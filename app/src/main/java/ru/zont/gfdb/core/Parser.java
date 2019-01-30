@@ -1,6 +1,7 @@
 package ru.zont.gfdb.core;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -13,9 +14,11 @@ import org.jsoup.select.Elements;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -244,7 +247,7 @@ public class Parser {
             doll.name = entry.get("title");
             doll.type = entry.get("tdoll_class");
             doll.rarity = Integer.valueOf(entry.get("rarity").replace("rarity-", "").replace("ex", "6"));
-            doll.craft = entry.get("field_t_doll_craft_time"); if (doll.craft.isEmpty()) doll.craft = "Unbuildable";
+            doll.craftTime = entry.get("field_t_doll_craft_time"); if (doll.craftTime.isEmpty()) doll.craftTime = "Unbuildable";
             doll.acc = Integer.parseInt(entry.get("acc"));
             doll.dmg = Integer.parseInt(entry.get("dmg"));
             doll.eva = Integer.parseInt(entry.get("eva"));
@@ -262,10 +265,10 @@ public class Parser {
                 doll.evaBar = 0; doll.rofBar = 0;
             }
 
-            doll.reccraft = null;
-            doll.reccraftLarge = null;
+            doll.craftReqs = null;
+            doll.heavyCraftReqs = null;
             Elements list = craftlistWiki.first().getElementsByTag("a");
-            if (!doll.craft.equals("Unbuildable")) {
+            if (!doll.craftTime.equals("Unbuildable")) {
                 for (Element e : list) {
                     if (e.attr("href").equals(doll.wiki.toString()
                             .replace("https://en.gfwiki.com", ""))) {
@@ -280,11 +283,11 @@ public class Parser {
                                     .replaceAll("\\D+", ""));
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraft = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
                         } else {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraft = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.craftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
                         }
                     }
                 }
@@ -303,11 +306,11 @@ public class Parser {
                                     .replaceAll("\\D+", ""));
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraftLarge = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
                         } else if (td.nextElementSibling() != null) {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraftLarge = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.heavyCraftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
                         }
                     }
                 }
@@ -364,7 +367,7 @@ public class Parser {
             doll.name = entry.getElementsByTag("h4").first().getElementsByTag("a").text();
             doll.rarity = td1.get(1).text().equals("EXTRA") ? 6 : Integer.valueOf(td1.get(3).text());
             doll.type = entry.getElementsByTag("u").text();
-            doll.craft = td1.first().text(); if (!doll.craft.matches("\\d{2}:\\d{2}")) doll.craft = "Unbuildable";
+            doll.craftTime = td1.first().text(); if (!doll.craftTime.matches("\\d{2}:\\d{2}")) doll.craftTime = "Unbuildable";
             doll.dmg = Integer.parseInt(td1.get(5).getElementsByClass("hidden").text());
             doll.acc = Integer.parseInt(td1.get(6).getElementsByClass("hidden").text());
             doll.eva = Integer.parseInt(td1.get(7).getElementsByClass("hidden").text());
@@ -382,10 +385,10 @@ public class Parser {
                 doll.evaBar = 0; doll.rofBar = 0;
             }
 
-            doll.reccraft = null;
-            doll.reccraftLarge = null;
+            doll.craftReqs = null;
+            doll.heavyCraftReqs = null;
             Elements list = craftlistWiki.first().getElementsByTag("a");
-            if (!doll.craft.equals("Unbuildable")) {
+            if (!doll.craftTime.equals("Unbuildable")) {
                 for (Element e : list) {
                     if (e.attr("href").equals(doll.wiki.toString()
                             .replace("https://en.gfwiki.com", ""))) {
@@ -400,11 +403,11 @@ public class Parser {
                                     .replaceAll("\\D+", ""));
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraft = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
                         } else {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraft = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.craftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
                         }
                     }
                 }
@@ -423,11 +426,11 @@ public class Parser {
                                     .replaceAll("\\D+", ""));
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraftLarge = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
                         } else {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.reccraftLarge = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.heavyCraftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
                         }
                     }
                 }
@@ -678,5 +681,37 @@ public class Parser {
             this("Exception while parsing "+doll.toString()+"'s "+element, caused);
             printStackTrace();
         }
+    }
+
+    public static TDolls getCachedList(Context context) throws ParserException {
+        File file = new File(context.getCacheDir(), "cachedList");
+        if (!file.exists()) throw new ParserException("List has not found in cache");
+
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            TDolls res = (TDolls) ois.readObject();
+            ois.close();
+            return res;
+        } catch (IOException | ClassNotFoundException e) {
+            new File(context.getCacheDir(), "lastupd").delete();
+            throw new ParserException("Error on reading list", e);
+        }
+    }
+
+    public static String[] getCraftbleTypes(CraftRecipe craft, int craftType, Context context) {
+        TDolls list;
+        try {
+            list = getCachedList(context);
+        } catch (ParserException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+
+        ArrayList<String> res = new ArrayList<>();
+        for (TDoll doll : list) {
+            if (res.contains(doll.type)) continue;
+            if (craft.isDollCraftable(doll, craftType)) res.add(doll.type);
+        }
+        return res.toArray(new String[0]);
     }
 }
