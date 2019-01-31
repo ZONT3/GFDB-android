@@ -39,8 +39,6 @@ public class LoadActivity extends AppCompatActivity {
     private TextView currserv;
     private Button changeserv;
 
-    private LoadList loader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -98,40 +96,43 @@ public class LoadActivity extends AppCompatActivity {
         }
 
         //noinspection ConstantConditions
-        if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE
-                || BuildConfig.VERSION_NAME.contains("-EX")) {
+        if (sysPrefs.getInt("lastStartVer", 0) != BuildConfig.VERSION_CODE) {
             upd = true;
             Toast.makeText(this, R.string.load_reload, Toast.LENGTH_SHORT).show();
         }
         sysPrefs.edit().putInt("lastStartVer", BuildConfig.VERSION_CODE).apply();
 
         //noinspection ConstantConditions
-        if (!upd) {
-            startActivity(new Intent(this, MainActivity.class)
-                    .putExtra("upd", false));
-            finish();
-        } else {
-            dateFile.delete();
-            //noinspection ConstantConditions
-            if (BuildConfig.VERSION_NAME.contains("-EX")) {
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.load_clearCache)
-                        .setPositiveButton(R.string.yes, (i1, i2) -> {
-                            clearDir(getCacheDir());
-                            startActivity(new Intent(this, LoadActivity.class));
-                            finish();
-                        })
-//                        .setNegativeButton(R.string.load_cleardata, (i1, i2) -> {
-//                            clearDir(getCacheDir());
-//                            clearDir(getFilesDir());
-//                            startActivity(new Intent(this, LoadActivity.class));
-//                            finish();
-//                        })
-                        .setNegativeButton(R.string.no, null)
-                        .setOnDismissListener(dialog -> new LoadList(this))
-                        .create().show();
-            } else loader = new LoadList(this);
+        if (BuildConfig.VERSION_NAME.contains("-EX") && !getIntent().getBooleanExtra("cleared", false)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle(R.string.load_clearCache)
+                    .setPositiveButton(R.string.yes, (i1, i2) -> {
+                        clearDir(getCacheDir());
+                        startActivity(new Intent(this, LoadActivity.class)
+                                .putExtra("cleared", true));
+                        finish();
+                    })
+                    .setNegativeButton(R.string.no, (dialog, which) -> update(dateFile))
+                    .setCancelable(false);
+            if (!upd) builder.setNeutralButton(R.string.load_dontreload, (dialog, which) -> goWithoutUpdate());
+            builder.create().show();
+            return;
         }
+
+        if (!upd && !getIntent().getBooleanExtra("cleared", false))
+            goWithoutUpdate();
+        else update(dateFile);
+    }
+
+    private void update(File dateFile) {
+        dateFile.delete();
+        new LoadList(this);
+    }
+
+    private void goWithoutUpdate() {
+        startActivity(new Intent(this, MainActivity.class)
+                .putExtra("upd", false));
+        finish();
     }
 
     private static void clearDir(File dir) {

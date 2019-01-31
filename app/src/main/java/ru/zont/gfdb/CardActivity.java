@@ -21,7 +21,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +60,7 @@ public class CardActivity extends AppCompatActivity {
             {R.id.card_pattern_7, R.id.card_pattern_8, R.id.card_pattern_9}};
 
     static final String TN_CONTENT = "transition:card:content";
-    private static final String LOG = "CardActivity";
+//    private static final String LOG = "CardActivity";
 
     private Lvl1Parser parser1;
     private Lvl2Parser parser2;
@@ -69,13 +68,13 @@ public class CardActivity extends AppCompatActivity {
     private ViewGroup loadView;
     private ViewPager viewPager;
     private View toTransit;
-    private ViewGroup root;
 
     private TDoll doll;
 
     private boolean mfReady = false;
     private boolean cgfReady = false;
     private boolean isTabless;
+    private ArrayList<WebView> webViews = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +87,7 @@ public class CardActivity extends AppCompatActivity {
         supportActionBar.setDisplayShowHomeEnabled(true);
         supportActionBar.setDisplayHomeAsUpEnabled(true);
 
-        setupTransition();
+        setup();
         init();
     }
 
@@ -113,7 +112,7 @@ public class CardActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void setupTransition() {
+    private void setup() {
         toTransit = null;
         if (!(isTabless = getResources().getBoolean(R.bool.card_tabless))) {
             viewPager = findViewById(R.id.card_viewpager);
@@ -145,36 +144,6 @@ public class CardActivity extends AppCompatActivity {
         if (PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("anim", false))
             toTransit.setTransitionName(TN_CONTENT);
-
-        root = findViewById(R.id.card_root);
-        getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
-            @Override
-            public void onTransitionStart(Transition transition) { }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                root.setVisibility(View.GONE); // <=============== Костыли. Убрать нахуй.
-                Thread thread = new Thread(() -> {
-                    try {
-                        Thread.sleep(5);
-                        runOnUiThread(() -> root.setVisibility(View.VISIBLE));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-                thread.setPriority(Thread.MAX_PRIORITY);
-                thread.start();
-            }
-
-            @Override
-            public void onTransitionCancel(Transition transition) { }
-
-            @Override
-            public void onTransitionPause(Transition transition) { }
-
-            @Override
-            public void onTransitionResume(Transition transition) { }
-        });
     }
 
     public static class MainFragment extends Fragment {
@@ -340,6 +309,7 @@ public class CardActivity extends AppCompatActivity {
 
             wr.get().parser2 = new Lvl2Parser(wr);
             wr.get().parser2.execute(tDoll);
+            wr.get().invalidateOptionsMenu();
         }
     }
 
@@ -473,6 +443,7 @@ public class CardActivity extends AppCompatActivity {
                 cardActivity.loadView.setVisibility(View.GONE);
                 cardActivity.loadView.setAlpha(1);
             });
+            cardActivity.webViews.add(skills);
             if (cardActivity.toTransit != null) cardActivity.toTransit.setTransitionName(null);
             if (cg != null) cg.setTransitionName(TN_CONTENT);
         }
@@ -569,6 +540,8 @@ public class CardActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card, menu);
+        menu.findItem(R.id.card_menu_craft)
+                .setVisible(doll != null && doll.getCraftTimeMins() < Integer.MAX_VALUE);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -603,11 +576,30 @@ public class CardActivity extends AppCompatActivity {
                             }
                         }).create().show();
                 return true;
+            case R.id.card_menu_craft:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.lib_tocraft_title)
+                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
+                            Intent intent = new Intent(this, CraftActivity.class)
+                                    .putExtra("id", doll.getId())
+                                    .putExtra("option", which);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .create().show();
+                return true;
 //            case R.id.card_menu_mod3:
 //
 //                return true;
             default: return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void finishAfterTransition() {
+        for (WebView wv : webViews)
+            wv.setVisibility(View.INVISIBLE);
+        super.finishAfterTransition();
     }
 
     @Override

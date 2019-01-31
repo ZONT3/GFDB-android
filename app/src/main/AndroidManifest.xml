@@ -13,7 +13,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".CraftActivity"></activity>
+        <activity android:name=".CraftActivity"
+            android:label="@string/main_craft"/>
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/prefs_title" />

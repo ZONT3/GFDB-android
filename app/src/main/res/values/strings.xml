@@ -67,6 +67,8 @@
     <string name="craft_libtitle_select">Select target</string>
     <string name="lib_tocraft_title">Select preferred craft type</string>
     <string name="load_change">Change</string>
+    <string name="load_dontreload">Don\'t reload</string>
+    <string name="card_menu_craft">To CraftCalc</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>

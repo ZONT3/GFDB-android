@@ -246,7 +246,6 @@ public class LibraryActivity extends AppCompatActivity {
                             activity.setResult(AppCompatActivity.RESULT_OK, intent);
                             activity.finish();
                         })
-                        .setCancelable(true)
                         .setNegativeButton(android.R.string.cancel, null)
                         .create().show();
                 break;

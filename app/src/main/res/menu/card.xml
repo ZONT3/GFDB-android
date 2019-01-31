@@ -12,4 +12,9 @@
         android:icon="@drawable/baseline_open_in_browser_white_48"
         android:title="@string/card_menu_link"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/card_menu_craft"
+        android:icon="@drawable/factory"
+        android:title="@string/card_menu_craft"
+        app:showAsAction="ifRoom" />
 </menu>
