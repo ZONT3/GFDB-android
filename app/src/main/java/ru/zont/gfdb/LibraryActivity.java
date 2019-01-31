@@ -72,7 +72,7 @@ public class LibraryActivity extends AppCompatActivity {
                         if (adapter == null) return;
                         TDoll tDoll = adapter.getDataset().get(itemPosition);
 
-                        if (!wr.get().getIntent().hasExtra("request")) {
+                        if (wr.get().getIntent().getIntExtra("request", -1) == -1) {
                             Intent intent = new Intent(wr.get(), CardActivity.class);
                             intent.putExtra("id", tDoll.getId());
                             wr.get().startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(wr.get(), v, CardActivity.TN_CONTENT).toBundle());

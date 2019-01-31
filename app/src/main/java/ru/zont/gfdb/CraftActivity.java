@@ -56,14 +56,11 @@ public class CraftActivity
     private NumberPicker ammo;
     private NumberPicker mp;
     private SeekBar craftType;
-    private Button set;
-    private Button get;
     private TextView craftTypeTW;
     private TextView cost;
     private TextView chances;
     private ProgressBar craftablePb;
     private TextView craftable;
-    private ConstraintLayout craftableContainer;
 
     private Thread craftableCheckerThread;
 
@@ -87,14 +84,11 @@ public class CraftActivity
         parts = findViewById(R.id.craft_parts);
         tries = findViewById(R.id.craft_tries);
         craftType = findViewById(R.id.craft_lc);
-        set = findViewById(R.id.craft_bt_set);
-        get = findViewById(R.id.craft_bt_get);
         craftTypeTW = findViewById(R.id.craft_lc_tw);
         cost = findViewById(R.id.craft_cost);
         chances = findViewById(R.id.craft_chances);
         craftablePb = findViewById(R.id.craft_craftable_pb);
         craftable = findViewById(R.id.craft_craftable);
-        craftableContainer = findViewById(R.id.craft_craftable_container);
 
         craftablePb.setIndeterminate(true);
 
@@ -105,7 +99,7 @@ public class CraftActivity
         parts.setOnValueChangedListener(this);
         tries.setOnValueChangedListener(this);
         tries.setMinValue(1); tries.setMaxValue(999); tries.setValue(1);
-        setCraft("400/400/400/200");
+        setCraft("430/430/430/230");
 
         int idPickerInput = Resources.getSystem().getIdentifier("numberpicker_input", "id", "android");
         ((TextView)mp.findViewById(idPickerInput)).setImeOptions(EditorInfo.IME_ACTION_NEXT);
@@ -223,10 +217,13 @@ public class CraftActivity
             mp.setMaxValue(9999); ammo.setMaxValue(9999);
             rat.setMaxValue(9999); parts.setMaxValue(9999);
         } else {
+            boolean jump = mp.getValue() > 999 || ammo.getValue() > 999
+                    || rat.getValue() > 999 || parts.getValue() > 999;
             mp.setMinValue(30); ammo.setMinValue(30);
             rat.setMinValue(30); parts.setMinValue(30);
             mp.setMaxValue(999); ammo.setMaxValue(999);
             rat.setMaxValue(999); parts.setMaxValue(999);
+            if (jump) setCraft("430/430/430/230");
         }
     }
 
@@ -289,12 +286,14 @@ public class CraftActivity
                                 ? doll.getCraftReqs() : doll.getHeavyCraftReqs());
                         break;
                     case OPTION_RECCOMEND:
-                        Crafts crafts = Crafts.load(this); // TODO Fix crash
+                        Crafts crafts = Crafts.load(this);
                         String regular = crafts.general.get(doll.getType());
                         String heavy = crafts.heavy.get(doll.getType());
                         Crafts.ExcEntry excEntry = crafts.exceptions.get(doll.getId());
-                        if ((regular == null || heavy == null) && excEntry == null)
+                        if (regular == null && heavy == null && excEntry == null)
                             throw new Exception("WTF? Standard craft for "+doll.getType()+" has not found!");
+                        assert regular != null;
+                        assert heavy != null;
 
                         if (excEntry != null) {
                             type = excEntry.craftType;
@@ -314,6 +313,7 @@ public class CraftActivity
                 runOnUiThread(() -> {
                     craftType.setProgress(type);
                     setCraft(recipe.toString());
+                    calculate();
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -338,5 +338,11 @@ public class CraftActivity
     public void startActivityForResult(Intent intent, int requestCode) {
         intent.putExtra("request", requestCode);
         super.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

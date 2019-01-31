@@ -54,7 +54,7 @@
     <string name="main_craft">Craft Calculator</string>
     <string name="load_wiki">Wiki dolls index</string>
     <string name="load_craftwiki">Wiki craft index</string>
-    <string name="craft_chances">Chances to craft at least one:</string>
+    <string name="craft_chances">Chances to produce at least one:</string>
     <string name="craft_constype_normal">Normal Construction</string>
     <string name="craft_constype_large1">Heavy Low Tier</string>
     <string name="craft_constype_large2">Heavy Medium Tier</string>
@@ -66,6 +66,7 @@
     <string name="craft_libtitle_droplist">Droplist</string>
     <string name="craft_libtitle_select">Select target</string>
     <string name="lib_tocraft_title">Select preferred craft type</string>
+    <string name="load_change">Change</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>
@@ -76,7 +77,7 @@
         <item>No.</item>
         <item>Name</item>
         <item>Rarity</item>
-        <item>Constr. time</item>
+        <item>Prod. time</item>
         <item>Type</item>
         <item>HP</item>
         <item>DMG</item>

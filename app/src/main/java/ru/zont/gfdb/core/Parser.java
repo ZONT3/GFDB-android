@@ -143,7 +143,8 @@ public class Parser {
     }
 
     private void check() throws IOException {
-        if (!gpListFile.exists() || !fwsListFile.exists() || !gpStatFile.exists())
+        if (!gpListFile.exists() || !fwsListFile.exists() || !gpStatFile.exists()
+                || !fwsStatFile.exists() || !wikiListFile.exists() || !wikiCraftlistFile.exists())
             throw new ListNotPreparedException("File has not found");
     }
 
@@ -284,10 +285,10 @@ public class Parser {
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
                             doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else {
+                        } else if (td.nextElementSibling() != null) {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.craftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.craftReqs = "SUM:" + val;
                         }
                     }
                 }
@@ -310,8 +311,8 @@ public class Parser {
                         } else if (td.nextElementSibling() != null) {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
-                        }
+                            doll.heavyCraftReqs = "SUM:" + val;
+                        } else doll.heavyCraftReqs = "1000/1000/1000/1000";
                     }
                 }
             }
@@ -407,7 +408,7 @@ public class Parser {
                         } else {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.craftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
+                            doll.craftReqs = String.format("SUM:%d", val);
                         }
                     }
                 }
@@ -427,11 +428,11 @@ public class Parser {
                             int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
                             doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else {
+                        } else if (td.nextElementSibling() != null) {
                             int val = Integer.valueOf(td.nextElementSibling().text()
                                     .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = String.format("%1$d/%1$d/%1$d/%1$d", val);
-                        }
+                            doll.heavyCraftReqs = "SUM:" + val;
+                        } else doll.heavyCraftReqs = "1000/1000/1000/1000";
                     }
                 }
             }

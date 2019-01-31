@@ -37,6 +37,29 @@
     <string name="load_fatal_err">Произошла критическая ошибка. Если прилоение не работает после переустановки, свяжитесь с разработчиком.</string>
     <string name="load_selectserv">Выберите сервер игры</string>
     <string name="prefs_server">Игровой сервер</string>
+    <string name="load_reload">Загружаю базу снова из-за обновления или экспериментальной версии</string>
+    <string name="load_clearCache">Очистить кэш?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="main_prefsChangedReloading">Сервер был сменен, перезагружаю базу данных</string>
+    <string name="prefs_title">Настройки</string>
+    <string name="load_cleardata">Очистить все данные</string>
+    <string name="load_selectedserver">Сервер: %s</string>
+    <string name="main_craft">Калькулятор Крафта</string>
+    <string name="load_wiki">Список из Wikia</string>
+    <string name="load_craftwiki">Список кравтов из Wikia</string>
+    <string name="craft_chances">Шансы на создание хотя бы одной:</string>
+    <string name="craft_constype_normal">Обычное производство</string>
+    <string name="craft_constype_large1">Тяжелое низкого уровня</string>
+    <string name="craft_constype_large2">Тяжелое среднего уровня</string>
+    <string name="craft_constype_large3">Тяжелое высокого уровня</string>
+    <string name="craft_tries">Попытка (-ки) (-ок)</string>
+    <string name="cacheloadfail">База данных не была загружена. Если ошибка повторяется, попробуйте переустановить приложение</string>
+    <string name="dberr">Ошибка при загрузке базы данных. Попробуйте переустановить приложение</string>
+    <string name="craft_craftable">Можно произвести:</string>
+    <string name="craft_libtitle_droplist">Дроплист</string>
+    <string name="craft_libtitle_select">Выберите цель</string>
+    <string name="lib_tocraft_title">Выберите предпочтительный рецепт:</string>
 
     <array name="lib_sort_arr">
         <item>No.</item>
@@ -50,4 +73,9 @@
         <item>EVA</item>
         <item>ROF</item>
     </array>
+    <array name="lib_tocraft_options">
+        <item>Минимально затратный</item>
+        <item>Рекомменд. для данного типа</item>
+    </array>
+    <string name="load_change">Сменить</string>
 </resources>

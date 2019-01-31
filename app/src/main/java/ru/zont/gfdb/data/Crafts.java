@@ -10,7 +10,7 @@ import java.util.HashMap;
 import ru.zont.gfdb.R;
 
 @SuppressWarnings("unused")
-public abstract class Crafts {
+public class Crafts {
     public HashMap<String, String> general;
     public HashMap<String, String> heavy;
     public HashMap<Integer, ExcEntry> exceptions;

@@ -10,7 +10,7 @@ public class CraftRecipe {
     public int parts;
 
     public CraftRecipe(String str) {
-        if (!str.matches("\\d{1,4}/\\d{1,4}/\\d{1,4}/\\d{1,4}")) return;
+        if (!str.matches("\\d+/\\d+/\\d+/\\d+")) return;
         String[] d = str.split("/");
         mp = Integer.valueOf(d[0]);
         ammo = Integer.valueOf(d[1]);
@@ -30,8 +30,22 @@ public class CraftRecipe {
     if (craftType > 0 && doll.heavyCraftReqs == null) return false;
     if (mp+ammo+rat+parts > 920 && doll.type.equals("HG")) return false;
 
+    if ((craftType <= 0) && (doll.craftReqs != null)
+            && doll.craftReqs.matches("SUM:\\d+")) {
+        CraftRecipe c = new CraftRecipe(doll.craftReqs);
+        if (Integer.valueOf(doll.craftReqs.replaceAll("SUM:", ""))
+                >= (c.mp + c.ammo + c.rat + c.parts)) return true;
+    }
+    if ((craftType < 0 || craftType > 0) && doll.heavyCraftReqs != null
+            && doll.heavyCraftReqs.matches("SUM:\\d+")) {
+        CraftRecipe c = new CraftRecipe(doll.heavyCraftReqs);
+        if (Integer.valueOf(doll.heavyCraftReqs.replaceAll("SUM:", ""))
+                >= (c.mp + c.ammo + c.rat + c.parts)) return true;
+    }
+
     CraftRecipe dollCraft;
     if (craftType < 0)
+        //noinspection ConstantConditions
         dollCraft = new CraftRecipe(doll.craftReqs != null ? doll.craftReqs : doll.heavyCraftReqs);
     else if (craftType == 0)
         dollCraft = new CraftRecipe(doll.craftReqs);
