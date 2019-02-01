@@ -2,6 +2,7 @@ package ru.zont.gfdb.core;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -9,19 +10,26 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import org.jsoup.Jsoup;
+import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -189,18 +197,24 @@ public class Parser {
         }
     }
 
+    @SuppressWarnings("unused")
     public ArrayList<ParserException> fullParse(TDoll doll) throws ParserException {
+        return fullParse(doll, null);
+    }
+
+    @SuppressWarnings("unused")
+    public ArrayList<ParserException> fullParse(TDoll doll, @Nullable ProgressListener listener) throws ParserException {
         if (doll.parsingLevel < 1)
             throw new ParserException(doll.toString() + "'s parsing level is < 1");
 
         ArrayList<ParserException> exceptions = new ArrayList<>();
         switch (gameServer) {
             case "EN":
-                fullParseEN(doll, exceptions);
+                fullParseEN(doll, exceptions, listener);
                 doll.parsingLevel = 2;
                 return exceptions;
             case "TW":
-                fullParseTW(doll, exceptions);
+                fullParseTW(doll, exceptions, listener);
                 doll.parsingLevel = 2;
                 return exceptions;
             default: throw new ParserException("Unknown server");
@@ -450,14 +464,73 @@ public class Parser {
         }
     }
 
+    interface ProgressModificator {
+        int modify(int loaded, int total);
+    }
+
+    private Element downloadPage(URL url, @Nullable ProgressListener listener) throws ParserException {
+        return downloadPage(url, listener, null, null);
+    }
+
+    private Element downloadPage(URL url, @Nullable ProgressListener listener,
+                                 @Nullable ProgressModificator elapsedMod,
+                                 @Nullable ProgressModificator totalMod) throws ParserException { //FIXME Эта ебаниа грузит мусор. Сука, почему?
+        if (elapsedMod == null) elapsedMod = (o1, o2) -> o1;
+        if (totalMod == null) totalMod = (o1, o2) -> o2;
+
+        File temp = new File(wikiListFile.getParentFile(), "parser_temp");
+        temp.delete();
+
+        BufferedInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                throw new IOException(String.format("Gamepress responsed HTTP%d: %s",
+                        connection.getResponseCode(), connection.getResponseMessage()));
+
+            in = new BufferedInputStream(connection.getInputStream());
+            out = new FileOutputStream(temp);
+
+            byte[] b = new byte[512];
+            int total = connection.getContentLength();
+            int loaded = 0;
+            int count;
+            while ((count = in.read(b, 0, b.length)) >= 0) {
+                out.write(b, 0, count);
+                loaded += count;
+
+                if (listener != null)
+                    listener.onProgress(
+                            elapsedMod.modify(loaded, total),
+                            totalMod.modify(loaded, total));
+            }
+
+            return Jsoup.parse(temp, "UTF-8").body();
+        } catch (IOException e) {
+            throw new ParserException(url.toString() + " connection error", e);
+        } finally {
+            try {
+                //noinspection ConstantConditions
+                in.close();
+                //noinspection ConstantConditions
+                out.close();
+            } catch (Throwable ignored) { }}
+    }
+
     @SuppressLint("DefaultLocale")
-    private void fullParseEN(TDoll doll, ArrayList<ParserException> exceptions) throws ParserException {
-        Element root;
-        try { root = Jsoup.connect(doll.gamepress.toString()).get().body(); }
-        catch (IOException e) { throw new ParserException("Gamepress connection error", e); }
+    private void fullParseEN(TDoll doll, ArrayList<ParserException> exceptions,
+                             @Nullable ProgressListener listener) throws ParserException {
+        Element root = downloadPage(doll.gamepress, listener, null,
+                (loaded, total) -> total * 2);
         Element gftwRoot = null;
-        try { gftwRoot = Jsoup.connect(doll.fws.toString()).get().body(); }
-        catch (IOException e) { e.printStackTrace(); }
+
+        try {
+            gftwRoot = downloadPage(doll.fws, listener,
+                (loaded, total) -> loaded + total,
+                (loaded, total) -> total * 2);
+        } catch (ParserException e) { e.printStackTrace(); }
 
         try {
             doll.cgMain = new URL("http://gamepress.gg"
@@ -566,13 +639,8 @@ public class Parser {
         Здесь могла быть ваша реклама */
     }
 
-    private static void fullParseTW(TDoll doll, ArrayList<ParserException> exceptions) throws ParserException {
-        Element root;
-        try {
-            root = Jsoup.connect(doll.fws + "").get();
-        } catch (IOException e) {
-            throw new ParserException("gf.fws.tw connection error", e);
-        }
+    private void fullParseTW(TDoll doll, ArrayList<ParserException> exceptions, ProgressListener listener) throws ParserException {
+        Element root = downloadPage(doll.fws, listener);
 
         try {
             doll.cgMain = doll.thumb;
@@ -675,10 +743,11 @@ public class Parser {
     }
 
     private static class ListNotPreparedException extends IOException {
+
         private ListNotPreparedException(String message) { super(message); }
     }
-
     public static class ParserException extends IOException {
+
         private ParserException(Throwable caused) { super(caused); }
         private ParserException(String message) { super(message); }
         private ParserException(String message, Throwable caused) { super(message, caused); }
@@ -686,6 +755,10 @@ public class Parser {
             this("Exception while parsing "+doll.toString()+"'s "+element, caused);
             printStackTrace();
         }
+    }
+
+    public interface ProgressListener {
+        void onProgress(int elapsed, int total);
     }
 
     public static TDolls getCachedList(Context context) throws ParserException {

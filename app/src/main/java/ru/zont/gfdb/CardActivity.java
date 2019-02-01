@@ -313,7 +313,7 @@ public class CardActivity extends AppCompatActivity {
         }
     }
 
-    private static class Lvl2Parser extends AsyncTask<TDoll, Void, TDoll> {
+    private static class Lvl2Parser extends AsyncTask<TDoll, Void, TDoll> implements Parser.ProgressListener {
         WeakReference<CardActivity> wr;
         ArrayList<Parser.ParserException> exceptions;
 
@@ -327,7 +327,7 @@ public class CardActivity extends AppCompatActivity {
                     .getString("server", "EN");
             Parser parser = new Parser(wr.get().getCacheDir(), server);
             try {
-                exceptions = parser.fullParse(tDolls[0]);
+                exceptions = parser.fullParse(tDolls[0], this);
             } catch (Parser.ParserException e) {
                 e.printStackTrace();
                 return null;
@@ -337,6 +337,18 @@ public class CardActivity extends AppCompatActivity {
                     .getBoolean("doll_cache", true))
                 DollCaching.cacheDoll(tDolls[0]);
             return tDolls[0];
+        }
+
+        @Override
+        public void onProgress(int elapsed, int total) {
+            wr.get().runOnUiThread(() -> {
+                ProgressBar pb = wr.get().findViewById(R.id.card_loadpb);
+                if (elapsed < total) {
+                    if (pb.isIndeterminate()) pb.setIndeterminate(false);
+                    pb.setMax(total);
+                    pb.setProgress(elapsed);
+                } else if (!pb.isIndeterminate()) pb.setIndeterminate(true);
+            });
         }
 
         @SuppressLint("SetTextI18n")
