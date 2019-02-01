@@ -570,9 +570,16 @@ public class CardActivity extends AppCompatActivity {
                         .setTitle(R.string.card_menu_link)
                         .setItems(R.array.card_links_en, (dialog, which) -> {
                             switch (which) {
-                                case 0: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getGamepress().toString()))); break;
-                                case 1: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getFws().toString()))); break;
-                                case 2: startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(doll.getWiki().toString()))); break;
+                                case 0: startActivity(new Intent(Intent.ACTION_VIEW)
+                                        .setData(Uri.parse(doll.getGamepress().toString()))); break;
+                                case 1: startActivity(new Intent(Intent.ACTION_VIEW)
+                                        .setData(Uri.parse(doll.getFws().toString()))); break;
+                                case 2:
+                                    if (doll.getWiki() != null)
+                                        startActivity(new Intent(Intent.ACTION_VIEW)
+                                                .setData(Uri.parse(doll.getWiki().toString())));
+                                    else Toast.makeText(this, R.string.nowiki, Toast.LENGTH_LONG).show();
+                                    break;
                             }
                         }).create().show();
                 return true;

@@ -20,7 +20,8 @@
             android:label="@string/prefs_title" />
         <activity
             android:name=".LoadActivity"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

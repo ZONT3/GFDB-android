@@ -267,7 +267,7 @@ public class CraftActivity
         content.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
 
-        Thread parsingThread = new Thread(() -> {
+        @SuppressLint("DefaultLocale") Thread parsingThread = new Thread(() -> {
             TDoll doll;
             try {
                 doll = Parser.getCachedList(this).getById(id);
@@ -282,8 +282,11 @@ public class CraftActivity
                     default:
                     case OPTION_MINIMUM:
                         type = doll.getCraftReqs() != null ? 0 : 1;
-                        recipe = new CraftRecipe(doll.getCraftReqs() != null
-                                ? doll.getCraftReqs() : doll.getHeavyCraftReqs());
+                        String str = doll.getCraftReqs() != null
+                                ? doll.getCraftReqs() : doll.getHeavyCraftReqs();
+                        if (str.matches("SUM:\\d+")) str = String.format("%1$d/%1$d/%1$d/%1$d",
+                                Integer.valueOf(str.replaceAll("SUM:", ""))/4);
+                        recipe = new CraftRecipe(str);
                         break;
                     case OPTION_RECCOMEND:
                         Crafts crafts = Crafts.load(this);

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/craft_recipe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <ImageView
+        android:id="@+id/craft_iw"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_mp"
+        app:layout_constraintStart_toStartOf="@+id/craft_mp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/manpower" />
+
+    <ImageView
+        android:id="@+id/craft_iw2"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_ammo"
+        app:layout_constraintStart_toStartOf="@+id/craft_ammo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ammo" />
+
+    <ImageView
+        android:id="@+id/craft_iw3"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_rat"
+        app:layout_constraintStart_toStartOf="@+id/craft_rat"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ration" />
+
+    <ImageView
+        android:id="@+id/craft_iw4"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="@+id/craft_parts"
+        app:layout_constraintStart_toStartOf="@+id/craft_parts"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/parts" />
+
+    <NumberPicker
+        android:id="@+id/craft_mp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:nextFocusForward="@id/craft_ammo"
+
+        app:layout_constraintEnd_toStartOf="@+id/craft_ammo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw" />
+
+    <NumberPicker
+        android:id="@+id/craft_ammo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:nextFocusForward="@id/craft_rat"
+        app:layout_constraintEnd_toStartOf="@+id/craft_rat"
+        app:layout_constraintStart_toEndOf="@+id/craft_mp"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw2" />
+
+    <NumberPicker
+        android:id="@+id/craft_rat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:nextFocusForward="@id/craft_parts"
+        app:layout_constraintEnd_toStartOf="@+id/craft_parts"
+        app:layout_constraintStart_toEndOf="@+id/craft_ammo"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw3" />
+
+    <NumberPicker
+        android:id="@+id/craft_parts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/craft_rat"
+        app:layout_constraintTop_toBottomOf="@+id/craft_iw4" />
+
+    <SeekBar
+        android:id="@+id/craft_lc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:max="3"
+        app:layout_constraintEnd_toStartOf="@+id/craft_parts"
+        app:layout_constraintStart_toEndOf="@+id/craft_mp"
+        app:layout_constraintTop_toBottomOf="@+id/craft_ammo" />
+
+    <TextView
+        android:id="@+id/craft_lc_tw"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/craft_constype_normal"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="@+id/craft_lc"
+        app:layout_constraintStart_toStartOf="@+id/craft_lc"
+        app:layout_constraintTop_toBottomOf="@+id/craft_lc" />
+
+</android.support.constraint.ConstraintLayout>

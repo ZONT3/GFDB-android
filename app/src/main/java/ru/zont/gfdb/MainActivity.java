@@ -101,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 !Objects.equals(PreferenceManager.getDefaultSharedPreferences(this)
                         .getString("server", "EN"), gameServer)) {
             Toast.makeText(this, R.string.main_prefsChangedReloading, Toast.LENGTH_LONG).show();
-            startActivity(new Intent(this, LoadActivity.class));
-            finish();
+            reloadDB();
         }
     }
 }

@@ -136,7 +136,8 @@ public class TDoll implements Serializable {
     public URL getGamepress() { return gamepress; }
 
     public URL getFws() { return fws; }
-    
+
+    @Nullable
     public URL getWiki() { return wiki; }
 
     @Override

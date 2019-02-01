@@ -268,54 +268,56 @@ public class Parser {
 
             doll.craftReqs = null;
             doll.heavyCraftReqs = null;
-            Elements list = craftlistWiki.first().getElementsByTag("a");
-            if (!doll.craftTime.equals("Unbuildable")) {
-                for (Element e : list) {
-                    if (e.attr("href").equals(doll.wiki.toString()
-                            .replace("https://en.gfwiki.com", ""))) {
-                        Element td = e.parent().parent();
-                        if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
+            try {
+                Elements list = craftlistWiki.first().getElementsByTag("a");
+                if (!doll.craftTime.equals("Unbuildable")) {
+                    for (Element e : list) {
+                        if (e.attr("href").equals(doll.wiki.toString()
+                                .replace("https://en.gfwiki.com", ""))) {
+                            Element td = e.parent().parent();
+                            if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
 
-                            int man = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else if (td.nextElementSibling() != null) {
-                            int val = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.craftReqs = "SUM:" + val;
+                                int man = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            } else if (td.nextElementSibling() != null) {
+                                int val = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.craftReqs = "SUM:" + val;
+                            }
+                        }
+                    }
+                    list = craftlistWiki.get(1).getElementsByTag("a");
+                    for (Element e : list) {
+                        if (e.attr("href").equals(doll.wiki.toString()
+                                .replace("https://en.gfwiki.com", ""))) {
+                            Element td = e.parent().parent();
+                            if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
+
+                                int man = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            } else if (td.nextElementSibling() != null) {
+                                int val = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.heavyCraftReqs = "SUM:" + val;
+                            } else doll.heavyCraftReqs = "1000/1000/1000/1000";
                         }
                     }
                 }
-                list = craftlistWiki.get(1).getElementsByTag("a");
-                for (Element e : list) {
-                    if (e.attr("href").equals(doll.wiki.toString()
-                            .replace("https://en.gfwiki.com", ""))) {
-                        Element td = e.parent().parent();
-                        if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
-
-                            int man = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else if (td.nextElementSibling() != null) {
-                            int val = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = "SUM:" + val;
-                        } else doll.heavyCraftReqs = "1000/1000/1000/1000";
-                    }
-                }
-            }
+            } catch (Exception e) { e.printStackTrace(); }
 
             doll.gamepress = new URL("https://girlsfrontline.gamepress.gg" + entry.get("path").replaceAll("\\\\", ""));
             doll.fws = new URL("http://gf.fws.tw/db/guns/info/" + doll.id);
@@ -363,6 +365,8 @@ public class Parser {
         }
         if (doll.wiki == null) Log.w("PARSER", String.format("%d WIKI ENTRY HAS NOT FOUND!", doll.getId()));
 
+        doll.craftReqs = null;
+        doll.heavyCraftReqs = null;
         try {
             Elements td1 = tableEntry.getElementsByTag("td");
             doll.name = entry.getElementsByTag("h4").first().getElementsByTag("a").text();
@@ -386,56 +390,56 @@ public class Parser {
                 doll.evaBar = 0; doll.rofBar = 0;
             }
 
-            doll.craftReqs = null;
-            doll.heavyCraftReqs = null;
-            Elements list = craftlistWiki.first().getElementsByTag("a");
-            if (!doll.craftTime.equals("Unbuildable")) {
-                for (Element e : list) {
-                    if (e.attr("href").equals(doll.wiki.toString()
-                            .replace("https://en.gfwiki.com", ""))) {
-                        Element td = e.parent().parent();
-                        if (!td.nextElementSibling().hasAttr("colspan")) {
+            try {
+                Elements list = craftlistWiki.first().getElementsByTag("a");
+                if (!doll.craftTime.equals("Unbuildable")) {
+                    for (Element e : list) {
+                        if (e.attr("href").equals(doll.wiki.toString()
+                                .replace("https://en.gfwiki.com", ""))) {
+                            Element td = e.parent().parent();
+                            if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
 
-                            int man = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else {
-                            int val = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.craftReqs = String.format("SUM:%d", val);
+                                int man = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.craftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            } else if (td.nextElementSibling() != null) {
+                                int val = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.craftReqs = "SUM:" + val;
+                            }
+                        }
+                    }
+                    list = craftlistWiki.get(1).getElementsByTag("a");
+                    for (Element e : list) {
+                        if (e.attr("href").equals(doll.wiki.toString()
+                                .replace("https://en.gfwiki.com", ""))) {
+                            Element td = e.parent().parent();
+                            if (td.nextElementSibling() != null && !td.nextElementSibling().hasAttr("colspan")) {
+
+                                int man = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
+                            } else if (td.nextElementSibling() != null) {
+                                int val = Integer.valueOf(td.nextElementSibling().text()
+                                        .replaceAll("\\D+", ""));
+                                doll.heavyCraftReqs = "SUM:" + val;
+                            } else doll.heavyCraftReqs = "1000/1000/1000/1000";
                         }
                     }
                 }
-                list = craftlistWiki.get(1).getElementsByTag("a");
-                for (Element e : list) {
-                    if (e.attr("href").equals(doll.wiki.toString()
-                            .replace("https://en.gfwiki.com", ""))) {
-                        Element td = e.parent().parent();
-                        if (!td.nextElementSibling().hasAttr("colspan")) {
-
-                            int man = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ammo = Integer.valueOf(td.nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int ration = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            int parts = Integer.valueOf(td.nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = String.format("%s/%s/%s/%s", man, ammo, ration, parts);
-                        } else if (td.nextElementSibling() != null) {
-                            int val = Integer.valueOf(td.nextElementSibling().text()
-                                    .replaceAll("\\D+", ""));
-                            doll.heavyCraftReqs = "SUM:" + val;
-                        } else doll.heavyCraftReqs = "1000/1000/1000/1000";
-                    }
-                }
-            }
+            } catch (Exception e) { e.printStackTrace(); }
 
             doll.thumb = new URL("http://gf.fws.tw"
                     + entry.getElementsByAttributeValueContaining("style", "background-image: url(")

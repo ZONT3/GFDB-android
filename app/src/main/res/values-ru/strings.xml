@@ -45,7 +45,7 @@
     <string name="prefs_title">Настройки</string>
     <string name="load_cleardata">Очистить все данные</string>
     <string name="load_selectedserver">Сервер: %s</string>
-    <string name="main_craft">Калькулятор Крафта</string>
+    <string name="main_craft">Кальк. Крафта</string>
     <string name="load_wiki">Список из Wikia</string>
     <string name="load_craftwiki">Список кравтов из Wikia</string>
     <string name="craft_chances">Шансы на создание хотя бы одной:</string>
@@ -60,6 +60,10 @@
     <string name="craft_libtitle_droplist">Дроплист</string>
     <string name="craft_libtitle_select">Выберите цель</string>
     <string name="lib_tocraft_title">Выберите предпочтительный рецепт:</string>
+    <string name="load_change">Сменить</string>
+    <string name="load_dontreload">Не перезагружать</string>
+    <string name="card_menu_craft">В Калькулятор Крафта</string>
+    <string name="craft_select">Выбрать…</string>
 
     <array name="lib_sort_arr">
         <item>No.</item>
@@ -77,5 +81,4 @@
         <item>Минимально затратный</item>
         <item>Рекомменд. для данного типа</item>
     </array>
-    <string name="load_change">Сменить</string>
 </resources>

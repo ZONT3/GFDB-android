@@ -38,6 +38,7 @@ public class LoadActivity extends AppCompatActivity {
 
     private TextView currserv;
     private Button changeserv;
+    private LoadList loadList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +127,7 @@ public class LoadActivity extends AppCompatActivity {
 
     private void update(File dateFile) {
         dateFile.delete();
-        new LoadList(this);
+        loadList = new LoadList(this);
     }
 
     private void goWithoutUpdate() {

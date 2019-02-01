@@ -38,83 +38,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/craft_iw"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_mp"
-                    app:layout_constraintStart_toStartOf="@+id/craft_mp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/manpower" />
-
-                <ImageView
-                    android:id="@+id/craft_iw2"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_ammo"
-                    app:layout_constraintStart_toStartOf="@+id/craft_ammo"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ammo" />
-
-                <ImageView
-                    android:id="@+id/craft_iw3"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_rat"
-                    app:layout_constraintStart_toStartOf="@+id/craft_rat"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ration" />
-
-                <ImageView
-                    android:id="@+id/craft_iw4"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_parts"
-                    app:layout_constraintStart_toStartOf="@+id/craft_parts"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/parts" />
-
-                <NumberPicker
-                    android:id="@+id/craft_mp"
-                    android:layout_width="wrap_content"
+                <include
+                    android:id="@+id/craft_recipe"
+                    layout="@layout/fragment_craft_recipe"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:nextFocusForward="@id/craft_ammo"
-
-                    app:layout_constraintEnd_toStartOf="@+id/craft_ammo"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_iw" />
-
-                <NumberPicker
-                    android:id="@+id/craft_ammo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:nextFocusForward="@id/craft_rat"
-                    app:layout_constraintEnd_toStartOf="@+id/craft_rat"
-                    app:layout_constraintStart_toEndOf="@+id/craft_mp"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_iw2" />
-
-                <NumberPicker
-                    android:id="@+id/craft_rat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:nextFocusForward="@id/craft_parts"
-                    app:layout_constraintEnd_toStartOf="@+id/craft_parts"
-                    app:layout_constraintStart_toEndOf="@+id/craft_ammo"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_iw3" />
-
-                <NumberPicker
-                    android:id="@+id/craft_parts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/craft_rat"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_iw4" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                     android:id="@+id/craft_bt_set"
@@ -122,10 +53,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:onClick="gotoLib"
-                    android:text="Select doll"
+                    android:text="@string/craft_select"
                     app:layout_constraintEnd_toStartOf="@+id/craft_bt_get"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_lc_tw" />
+                    app:layout_constraintTop_toBottomOf="@+id/craft_recipe" />
 
                 <Button
                     android:id="@+id/craft_bt_get"
@@ -133,33 +64,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:onClick="gotoLib"
-                    android:text="Droplist"
+                    android:text="@string/craft_libtitle_droplist"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/craft_bt_set"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_lc_tw" />
-
-                <SeekBar
-                    android:id="@+id/craft_lc"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="32dp"
-                    android:max="3"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_bt_get"
-                    app:layout_constraintStart_toStartOf="@+id/craft_bt_set"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_ammo" />
-
-                <TextView
-                    android:id="@+id/craft_lc_tw"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/craft_constype_normal"
-                    android:textAlignment="center"
-                    app:layout_constraintEnd_toEndOf="@+id/craft_lc"
-                    app:layout_constraintStart_toStartOf="@+id/craft_lc"
-                    app:layout_constraintTop_toBottomOf="@+id/craft_lc" />
+                    app:layout_constraintTop_toBottomOf="@+id/craft_recipe" />
 
                 <View
                     android:id="@+id/divider3"
@@ -172,6 +80,15 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/craft_bt_set" />
+
+                <Space
+                    android:id="@+id/space"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/divider3" />
 
                 <NumberPicker
                     android:id="@+id/craft_tries"
@@ -221,15 +138,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/craft_cost" />
 
-                <Space
-                    android:id="@+id/space"
-                    android:layout_width="1dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/divider3" />
-
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/craft_craftable_container"
                     android:layout_width="wrap_content"
@@ -243,6 +151,7 @@
                         style="?android:attr/progressBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:indeterminate="true"
                         android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
