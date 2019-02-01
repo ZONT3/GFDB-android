@@ -487,6 +487,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
+            android:id="@+id/card_loadpb"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
