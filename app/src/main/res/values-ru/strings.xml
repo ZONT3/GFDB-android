@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Girls\' Frontline DB</string>
     <string name="load_loading">Загрузка…</string>
     <string name="load_dl">Загрузка списков…</string>
     <string name="load_writing">Запись в кэш…</string>
@@ -81,4 +80,5 @@
         <item>Минимально затратный</item>
         <item>Рекомменд. для данного типа</item>
     </array>
+    <string name="nowiki">Осутсвует ссылка на вики. Обратите внимание, что поддержка MOD3 этим приложением будет введена когда эта функция появится на EN сервере.</string>
 </resources>

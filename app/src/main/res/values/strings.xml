@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Girls\' Frontline DB</string>
+    <string name="app_name" translatable="false">T-Dolls DB</string>
     <string name="load_loading">Loading…</string>
     <string name="load_dl">Downloading T-Doll list…</string>
     <string name="load_writing">Writing to cache…</string>
