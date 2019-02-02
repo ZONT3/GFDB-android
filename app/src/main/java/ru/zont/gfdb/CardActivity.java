@@ -584,16 +584,20 @@ public class CardActivity extends AppCompatActivity {
                         }).create().show();
                 return true;
             case R.id.card_menu_craft:
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.lib_tocraft_title)
-                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
-                            Intent intent = new Intent(this, CraftActivity.class)
-                                    .putExtra("id", doll.getId())
-                                    .putExtra("option", which);
-                            startActivity(intent);
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .create().show();
+                Intent intent = new Intent(this, CraftActivity.class)
+                        .putExtra("id", doll.getId());
+                startActivity(intent);
+
+//                new AlertDialog.Builder(this)
+//                        .setTitle(R.string.lib_tocraft_title)
+//                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
+//                            Intent intent = new Intent(this, CraftActivity.class)
+//                                    .putExtra("id", doll.getId())
+//                                    .putExtra("option", which);
+//                            startActivity(intent);
+//                        })
+//                        .setNegativeButton(android.R.string.cancel, null)
+//                        .create().show();
                 return true;
 //            case R.id.card_menu_mod3:
 //

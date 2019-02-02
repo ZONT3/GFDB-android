@@ -76,7 +76,7 @@ public class LibraryActivity extends AppCompatActivity {
                             Intent intent = new Intent(wr.get(), CardActivity.class);
                             intent.putExtra("id", tDoll.getId());
                             wr.get().startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(wr.get(), v, CardActivity.TN_CONTENT).toBundle());
-                        } else returnDoll(wr, tDoll.getId(), wr.get().getIntent().getIntExtra("request", -1));
+                        } else returnDoll(wr, tDoll.getId()/*, wr.get().getIntent().getIntExtra("request", -1)*/);
                     }, tdolls);
 
             if (wr.get().getIntent().getBooleanExtra("filter_buildable", false))
@@ -233,27 +233,31 @@ public class LibraryActivity extends AppCompatActivity {
         }
     }
 
-    private static void returnDoll(WeakReference<LibraryActivity> wr, int id, int request) {
+    private static void returnDoll(WeakReference<LibraryActivity> wr, int id/*, int request*/) {
         LibraryActivity activity = wr.get();
         Intent intent = new Intent();
         intent.putExtra("id", id);
-        switch (request) {
-            case CraftActivity.REQUEST_SETDOLL:
-                new AlertDialog.Builder(activity)
-                        .setTitle(R.string.lib_tocraft_title)
-                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
-                            intent.putExtra("option", which);
-                            activity.setResult(AppCompatActivity.RESULT_OK, intent);
-                            activity.finish();
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .create().show();
-                break;
-            default:
-                activity.setResult(AppCompatActivity.RESULT_CANCELED, intent);
-                activity.finish();
-                break;
-        }
+
+        activity.setResult(AppCompatActivity.RESULT_OK, intent);
+        activity.finish();
+
+//        switch (request) {
+//            case CraftActivity.REQUEST_SETDOLL:
+//                new AlertDialog.Builder(activity)
+//                        .setTitle(R.string.lib_tocraft_title)
+//                        .setItems(R.array.lib_tocraft_options, (dialog, which) -> {
+//                            intent.putExtra("option", which);
+//                            activity.setResult(AppCompatActivity.RESULT_OK, intent);
+//                            activity.finish();
+//                        })
+//                        .setNegativeButton(android.R.string.cancel, null)
+//                        .create().show();
+//                break;
+//            default:
+//                activity.setResult(AppCompatActivity.RESULT_OK, intent);
+//                activity.finish();
+//                break;
+//        }
     }
 
     @Override

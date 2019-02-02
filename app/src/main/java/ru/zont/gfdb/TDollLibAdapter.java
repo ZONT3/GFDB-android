@@ -205,30 +205,6 @@ public class TDollLibAdapter extends RecyclerView.Adapter<TDollLibAdapter.VH> {
                 .into(holder.mThumb);
     }
 
-    static class GFTWTransform extends BitmapTransformation {
-        private static final String ID = "ru.zont.gfdb.TDollLibAdapter.GFTWTransform";
-
-        @Override
-        protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap toTransform, int outWidth, int outHeight) {
-            return Bitmap.createBitmap(toTransform, 0, 0, toTransform.getWidth()/2, toTransform.getHeight());
-        }
-
-        @Override
-        public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
-            messageDigest.update(ID.getBytes(Charset.forName("UTF-8")));
-        }
-
-        @Override
-        public int hashCode() {
-            return ID.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof GFTWTransform;
-        }
-    }
-
     @Override
     public int getItemCount() {
         if (dataset==null) return 0;

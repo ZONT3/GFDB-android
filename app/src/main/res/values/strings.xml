@@ -71,6 +71,7 @@
     <string name="card_menu_craft">To CraftCalc</string>
     <string name="craft_select">Select doll</string>
     <string name="nowiki">Wiki entry not found. MOD3 supporting will be when this function is implemented on EN server</string>
+    <string name="craft_remove">Remove</string>
 
     <array name="card_links_en">
         <item>English version (gamepress.gg)</item>

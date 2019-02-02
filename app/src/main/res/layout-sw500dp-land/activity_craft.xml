@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/craft_tb">
 
-        <android.support.constraint.ConstraintLayout
+        <ScrollView
             android:id="@+id/craft_left"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -36,66 +36,59 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <include
-                android:id="@+id/craft_recipe"
-                layout="@layout/fragment_craft_recipe"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/craft_bt_set"
-                android:layout_width="130dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:onClick="gotoLib"
-                android:text="@string/craft_select"
-                app:layout_constraintEnd_toStartOf="@+id/craft_bt_get"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/craft_tries" />
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/craft_bt_get"
-                android:layout_width="130dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:onClick="gotoLib"
-                android:text="@string/craft_libtitle_droplist"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/craft_bt_set"
-                app:layout_constraintTop_toBottomOf="@+id/craft_tries" />
 
-            <NumberPicker
-                android:id="@+id/craft_tries"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toStartOf="@+id/space"
-                app:layout_constraintTop_toBottomOf="@+id/craft_recipe" />
+                    <include
+                        android:id="@+id/craft_doll"
+                        layout="@layout/fragment_craft_doll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="8"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/craft_tries"
-                android:textAlignment="viewStart"
-                app:layout_constraintBottom_toBottomOf="@+id/craft_tries"
-                app:layout_constraintStart_toEndOf="@+id/space"
-                app:layout_constraintTop_toTopOf="@+id/craft_tries" />
+                    <Button
+                        android:id="@+id/craft_bt_set"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:onClick="gotoLib"
+                        android:text="@string/craft_select"
+                        app:layout_constraintEnd_toStartOf="@+id/craft_bt_get"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/craft_recipe" />
 
-            <android.support.v4.widget.Space
-                android:id="@+id/space"
-                android:layout_width="1dp"
-                android:layout_height="1dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/craft_bt_get" />
+                    <Button
+                        android:id="@+id/craft_bt_get"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:onClick="gotoLib"
+                        android:text="@string/craft_libtitle_droplist"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/craft_bt_set"
+                        app:layout_constraintTop_toBottomOf="@+id/craft_recipe" />
 
-        </android.support.constraint.ConstraintLayout>
+                    <include
+                        android:id="@+id/craft_recipe"
+                        layout="@layout/fragment_craft_recipe"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/craft_doll" />
+                </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
+        </ScrollView>
 
         <View
             android:id="@+id/divider4"
@@ -103,18 +96,45 @@
             android:layout_height="0dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/craft_left"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/craft_left" />
+
+        <View
+            android:id="@+id/divider5"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/craft_tries"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <NumberPicker
+            android:id="@+id/craft_tries"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/divider4"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/craft_tries"
+            android:textAlignment="viewStart"
+            app:layout_constraintBottom_toTopOf="@+id/craft_tries"
+            app:layout_constraintEnd_toEndOf="@+id/craft_tries"
+            app:layout_constraintStart_toStartOf="@+id/craft_tries" />
 
         <TextView
             android:id="@+id/craft_cost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material.Display2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/divider4"
+            app:layout_constraintStart_toEndOf="@+id/divider5"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="1000/800/800/400" />
 
@@ -127,7 +147,7 @@
             android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material.Large"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/divider4"
+            app:layout_constraintStart_toEndOf="@+id/divider5"
             app:layout_constraintTop_toBottomOf="@+id/craft_cost" />
 
         <android.support.constraint.ConstraintLayout
@@ -136,7 +156,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/divider4"
+            app:layout_constraintStart_toEndOf="@+id/divider5"
             app:layout_constraintTop_toBottomOf="@+id/craft_chances">
 
             <ProgressBar

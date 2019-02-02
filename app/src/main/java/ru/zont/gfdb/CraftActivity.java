@@ -4,48 +4,57 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.zont.gfdb.core.CraftRecipe;
+import ru.zont.gfdb.core.Dimension;
 import ru.zont.gfdb.core.Parser;
 import ru.zont.gfdb.core.TDoll;
 import ru.zont.gfdb.data.Crafts;
 
 public class CraftActivity
         extends AppCompatActivity
-        implements SeekBar.OnSeekBarChangeListener, NumberPicker.OnValueChangeListener {
+        implements SeekBar.OnSeekBarChangeListener, NumberPicker.OnValueChangeListener,
+                AdapterView.OnItemSelectedListener {
     private static final int[] RARITY_TABLE_COLOR = {-1, -1, R.color.rarity_common, R.color.rarity_rare,
             R.color.rarity_epic, R.color.rarity_legend, R.color.rarity_extra};
+    private static final String[] RARITY_TABLE = {"", "", "★★", "★★★", "★★★★", "★★★★★", "EXTRA"};
     private static final int[] CONSTRUCTION_TYPES = {
             R.string.craft_constype_normal, R.string.craft_constype_large1,
             R.string.craft_constype_large2, R.string.craft_constype_large3};
     static final int REQUEST_SETDOLL = 228;
     static final int OPTION_MINIMUM = 0;
     static final int OPTION_RECCOMEND = 1;
+    private static final long ANIM_DELAY = 400;
 
     private ViewGroup content;
     private ViewGroup loading;
@@ -61,8 +70,19 @@ public class CraftActivity
     private TextView chances;
     private ProgressBar craftablePb;
     private TextView craftable;
+    private Button set;
 
     private Thread craftableCheckerThread;
+
+    private TDoll dollToParse;
+    private ViewGroup dollView;
+    private Spinner option;
+    private TextView dollName;
+    private TextView dollMeta;
+    private ImageView dollThumb;
+
+    private int colorNormal;
+    private long lastAnim;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -89,6 +109,14 @@ public class CraftActivity
         chances = findViewById(R.id.craft_chances);
         craftablePb = findViewById(R.id.craft_craftable_pb);
         craftable = findViewById(R.id.craft_craftable);
+        dollView = findViewById(R.id.craft_doll);
+        option = findViewById(R.id.craft_doll_option);
+        dollName = findViewById(R.id.craft_doll_name);
+        dollMeta = findViewById(R.id.craft_doll_meta);
+        dollThumb = findViewById(R.id.craft_doll_thumb);
+        set = findViewById(R.id.craft_bt_set);
+
+        colorNormal = set.getCurrentTextColor();
 
         craftablePb.setIndeterminate(true);
 
@@ -112,7 +140,7 @@ public class CraftActivity
         calculate();
 
         if (getIntent().hasExtra("id"))
-            parseDoll(getIntent());
+            prepareAndParseDoll(getIntent().getIntExtra("id", -1));
     }
 
     private void setCraft(String craft) {
@@ -243,9 +271,14 @@ public class CraftActivity
                 startActivity(intent);
                 break;
             case R.id.craft_bt_set:
-                intent.putExtra("filter_buildable", true);
-                intent.putExtra("title", getString(R.string.craft_libtitle_select));
-                startActivityForResult(intent, REQUEST_SETDOLL);
+                if (dollToParse == null) {
+                    intent.putExtra("filter_buildable", true);
+                    intent.putExtra("title", getString(R.string.craft_libtitle_select));
+                    startActivityForResult(intent, REQUEST_SETDOLL);
+                } else {
+                    dollToParse = null;
+                    invalidateDollState();
+                }
                 break;
         }
     }
@@ -255,86 +288,187 @@ public class CraftActivity
         switch (requestCode) {
             case REQUEST_SETDOLL:
                 if (resultCode != RESULT_OK || data == null) return;
-                parseDoll(data);
+
+                int id = data.getIntExtra("id", -1);
+                prepareAndParseDoll(id);
                 break;
         }
     }
 
-    private void parseDoll(@NonNull Intent data) {
-        int id = data.getIntExtra("id", -1);
-        int option = data.getIntExtra("option", OPTION_MINIMUM);
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        option.setOnItemSelectedListener(null);
+        new Thread(this::parseDoll).start();
+    }
 
-        content.setVisibility(View.GONE);
-        loading.setVisibility(View.VISIBLE);
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) { }
 
-        @SuppressLint("DefaultLocale") Thread parsingThread = new Thread(() -> {
-            TDoll doll;
+    @SuppressLint("DefaultLocale")
+    private void prepareAndParseDoll(int id) {
+        setLoading(true);
+
+        Thread parserThread = new Thread(() -> {
             try {
-                doll = Parser.getCachedList(this).getById(id);
-                if (doll == null) throw new Exception("Unknown ID");
-                if (doll.getCraftReqs() == null && doll.getHeavyCraftReqs() == null
-                        || doll.getCraftTime().equals("Unbuildable"))
-                    throw new Exception("Doll is unbuildable");
-
-                CraftRecipe recipe;
-                int type;
-                switch (option) {
-                    default:
-                    case OPTION_MINIMUM:
-                        type = doll.getCraftReqs() != null ? 0 : 1;
-                        String str = doll.getCraftReqs() != null
-                                ? doll.getCraftReqs() : doll.getHeavyCraftReqs();
-                        if (str.matches("SUM:\\d+")) str = String.format("%1$d/%1$d/%1$d/%1$d",
-                                Integer.valueOf(str.replaceAll("SUM:", ""))/4);
-                        recipe = new CraftRecipe(str);
-                        break;
-                    case OPTION_RECCOMEND:
-                        Crafts crafts = Crafts.load(this);
-                        String regular = crafts.general.get(doll.getType());
-                        String heavy = crafts.heavy.get(doll.getType());
-                        Crafts.ExcEntry excEntry = crafts.exceptions.get(doll.getId());
-                        if (regular == null && heavy == null && excEntry == null)
-                            throw new Exception("WTF? Standard craft for "+doll.getType()+" has not found!");
-                        assert regular != null;
-                        assert heavy != null;
-
-                        if (excEntry != null) {
-                            type = excEntry.craftType;
-                            recipe = new CraftRecipe(excEntry.value);
-                        } else if (doll.getCraftReqs() != null &&
-                                CraftRecipe.isDollCraftable(doll, regular, 0)) {
-                            type = 0;
-                            recipe = new CraftRecipe(regular);
-                        } else if (doll.getHeavyCraftReqs() != null &&
-                                CraftRecipe.isDollCraftable(doll, heavy, 1)) {
-                            type = 1;
-                            recipe = new CraftRecipe(heavy);
-                        } else throw new Exception("Not found common recipe for " + doll);
-                        break;
-                }
+                dollToParse = Parser.getCachedList(this)
+                        .getById(id);
+                if (dollToParse == null) throw new Exception("Failed to get doll");
 
                 runOnUiThread(() -> {
-                    craftType.setProgress(type);
-                    setCraft(recipe.toString());
-                    calculate();
+                    invalidateDollState();
+
+                    dollName.setText(dollToParse.getName());
+                    dollMeta.setText(Html.fromHtml(
+                            String.format("No.%d <font color=#%06X>%s</font> %s",
+                                    dollToParse.getId(),
+                                    (0xFFFFFF & ResourcesCompat.getColor(getResources(), RARITY_TABLE_COLOR[dollToParse.getRarity()], null)),
+                                    RARITY_TABLE[dollToParse.getRarity()],
+                                    dollToParse.getType())));
+
+                    RequestOptions options = new RequestOptions().override(Dimension.setDp(80, 80, this).pxX);
+                    if (dollToParse.getThumb().getHost().contains("fws"))
+                        options = new RequestOptions()
+                                .override(Dimension.setDp(80, 160, this).pxX, Dimension.setDp(80, 160, this).pxY)
+                                .transform(new GFTWTransform());
+                    Glide.with(this)
+                            .load(dollToParse.getThumb().toString())
+                            .apply(options)
+                            .into(dollThumb);
+                    dollView.setVisibility(View.VISIBLE);
                 });
+
+                parseDoll();
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error", Toast.LENGTH_LONG).show());
-            } finally {
                 runOnUiThread(() -> {
-                    content.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadein));
-                    loading.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadeout));
-                    content.setVisibility(View.VISIBLE);
-                    loading.postOnAnimation(() -> {
-                        loading.setVisibility(View.GONE);
-                        loading.setAlpha(1);
-                    });
+                    dollToParse = null;
+                    invalidateDollState();
+                    setLoading(false);
+                    Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 });
             }
         });
-        parsingThread.setPriority(Thread.MAX_PRIORITY);
-        parsingThread.start();
+        parserThread.setPriority(Thread.MAX_PRIORITY);
+        parserThread.start();
+    }
+
+    private void invalidateDollState() {
+        boolean b = dollToParse == null;
+
+        mp.setEnabled(b);
+        ammo.setEnabled(b);
+        rat.setEnabled(b);
+        parts.setEnabled(b);
+        craftType.setEnabled(b);
+        dollView.setVisibility(b ? View.GONE : View.VISIBLE);
+
+        set.setText(b ? R.string.craft_select : R.string.craft_remove);
+        set.setTextColor(b ? colorNormal
+                : ResourcesCompat.getColor(getResources(), android.R.color.holo_red_light, null));
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void parseDoll() {
+        if (dollToParse == null) return;
+        runOnUiThread(() -> {
+            option.setOnItemSelectedListener(null);
+            setLoading(true);
+        });
+
+        try {
+            if (dollToParse.getCraftReqs() == null && dollToParse.getHeavyCraftReqs() == null
+                    || dollToParse.getCraftTime().equals("Unbuildable"))
+                throw new Exception("Doll is unbuildable");
+
+            CraftRecipe recipe;
+            int type;
+            switch (option.getSelectedItemPosition()) {
+                default:
+                case OPTION_MINIMUM:
+                    type = dollToParse.getCraftReqs() != null ? 0 : 1;
+                    String str = dollToParse.getCraftReqs() != null
+                            ? dollToParse.getCraftReqs() : dollToParse.getHeavyCraftReqs();
+                    if (str.matches("SUM:\\d+")) str = String.format("%1$d/%1$d/%1$d/%1$d",
+                            Integer.valueOf(str.replaceAll("SUM:", "")) / 4);
+                    recipe = new CraftRecipe(str);
+                    break;
+                case OPTION_RECCOMEND:
+                    Crafts crafts = Crafts.load(this);
+                    String regular = crafts.general.get(dollToParse.getType());
+                    String heavy = crafts.heavy.get(dollToParse.getType());
+                    Crafts.ExcEntry excEntry = crafts.exceptions.get(dollToParse.getId());
+                    if (regular == null && heavy == null && excEntry == null)
+                        throw new Exception("WTF? Standard craft for " + dollToParse.getType() + " has not found!");
+                    assert regular != null;
+                    assert heavy != null;
+
+                    if (excEntry != null) {
+                        type = excEntry.craftType;
+                        recipe = new CraftRecipe(excEntry.value);
+                    } else if (dollToParse.getCraftReqs() != null &&
+                            CraftRecipe.isDollCraftable(dollToParse, regular, 0)) {
+                        type = 0;
+                        recipe = new CraftRecipe(regular);
+                    } else if (dollToParse.getHeavyCraftReqs() != null &&
+                            CraftRecipe.isDollCraftable(dollToParse, heavy, 1)) {
+                        type = 1;
+                        recipe = new CraftRecipe(heavy);
+                    } else if (dollToParse.getCraftReqs() != null){
+                        type = 0;
+                        recipe = new CraftRecipe(dollToParse.getCraftReqs());
+                    } else if (dollToParse.getHeavyCraftReqs() != null){
+                        type = 1;
+                        recipe = new CraftRecipe(dollToParse.getHeavyCraftReqs());
+                    } else throw new Exception("Not found common recipe for " + dollToParse);
+                    break;
+            }
+
+            runOnUiThread(() -> {
+                craftType.setProgress(type);
+                setCraft(recipe.toString());
+                option.setEnabled(true);
+                calculate();
+                setLoading(false);
+                option.setOnItemSelectedListener(this);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                dollToParse = null;
+                invalidateDollState();
+                setLoading(false);
+            });
+        }
+    }
+
+    private void setLoading(boolean b) {
+        if ((loading.getVisibility() == View.VISIBLE) == b) return;
+        if (System.currentTimeMillis() - lastAnim < ANIM_DELAY) {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(() -> setLoading(b));
+                }
+            }, ANIM_DELAY);
+            return;
+        }
+
+        ViewGroup showing = b ? loading : content;
+        ViewGroup hidding = b ? content : loading;
+
+        hidding.clearAnimation();
+        showing.clearAnimation();
+        hidding.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadeout));
+        showing.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadein));
+
+        showing.setVisibility(View.VISIBLE);
+        hidding.postOnAnimation(() -> {
+            hidding.setVisibility(View.INVISIBLE);
+            hidding.setAlpha(1);
+        });
+
+        lastAnim = System.currentTimeMillis();
     }
 
     @Override
