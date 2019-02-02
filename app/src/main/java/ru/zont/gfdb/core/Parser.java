@@ -10,26 +10,20 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import org.jsoup.Jsoup;
-import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -499,7 +493,7 @@ public class Parser {
             byte[] b = new byte[512];
             int loaded = 0;
             int count;
-            while ((count = in.read(b, 0, b.length)) >= 0) {
+            while ((count = in.read(b, 0, 512)) >= 0) {
                 out.write(b, 0, count);
                 loaded += count;
 
@@ -518,7 +512,8 @@ public class Parser {
                 in.close();
                 //noinspection ConstantConditions
                 out.close();
-            } catch (Throwable ignored) { }}
+            } catch (Throwable ignored) { }
+        }
     }
 
     @SuppressLint("DefaultLocale")
