@@ -474,7 +474,7 @@ public class Parser {
 
     private Element downloadPage(URL url, @Nullable ProgressListener listener,
                                  @Nullable ProgressModificator elapsedMod,
-                                 @Nullable ProgressModificator totalMod) throws ParserException { //FIXME Эта ебаниа грузит мусор. Сука, почему?
+                                 @Nullable ProgressModificator totalMod) throws ParserException {
         if (elapsedMod == null) elapsedMod = (o1, o2) -> o1;
         if (totalMod == null) totalMod = (o1, o2) -> o2;
 
@@ -485,16 +485,18 @@ public class Parser {
         FileOutputStream out = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(true);
             connection.connect();
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
-                throw new IOException(String.format("Gamepress responsed HTTP%d: %s",
+                throw new IOException(String.format("%s responsed HTTP%d: %s", url.getHost(),
                         connection.getResponseCode(), connection.getResponseMessage()));
 
+            int total = connection.getContentLength();
             in = new BufferedInputStream(connection.getInputStream());
             out = new FileOutputStream(temp);
 
             byte[] b = new byte[512];
-            int total = connection.getContentLength();
             int loaded = 0;
             int count;
             while ((count = in.read(b, 0, b.length)) >= 0) {
