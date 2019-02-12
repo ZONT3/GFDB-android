@@ -398,6 +398,8 @@ public class CardActivity extends AppCompatActivity {
                         })
                         .into(cg);
 
+            //TODO Rewrite this code
+
             roles.setText(tDoll.getRole());
             affects.setText(activity.getString(R.string.card_affects)+" "+tDoll.getAffect().toUpperCase());
             buffs.setText(Html.fromHtml(tDoll.getBuffs()));

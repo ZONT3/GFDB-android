@@ -97,22 +97,32 @@ public class TDoll implements Serializable {
 
     public int getRof() { return rof; }
 
+    @NonNull
     public URL getThumb() { return thumb; }
 
+    @Nullable
     public URL getCgMain() { return cgMain; }
 
+    @Nullable
     public URL getCgDamage() { return cgDamage; }
 
+    @Nullable
     public URL getCgMainHQ() { return cgMainHQ; }
 
+    @Nullable
     public URL getCgDamageHQ() { return cgDamageHQ; }
 
+    @Nullable
     public ArrayList<URL[]> getCostumes() { return costumes; }
 
+    @Nullable
     public String getDescription() { return description; }
 
+    @Nullable
     public int[][] getPattern() { return pattern; }
 
+    @Nullable
+    @HTML
     public String getSkills() { return skills; }
 
     public int getHpBar() { return hpBar; }
@@ -125,16 +135,23 @@ public class TDoll implements Serializable {
 
     public int getRofBar() { return rofBar; }
 
+    @Nullable
     public ArrayList<String> getCostitles() { return costitles; }
 
+    @Nullable
     public String getRole() { return role; }
 
+    @Nullable
     public String getAffect() { return affect; }
 
+    @Nullable
+    @HTML
     public String getBuffs() { return buffs; }
 
+    @NonNull
     public URL getGamepress() { return gamepress; }
 
+    @NonNull
     public URL getFws() { return fws; }
 
     @Nullable
@@ -152,4 +169,7 @@ public class TDoll implements Serializable {
     public String toString() {
         return String.format("[%d*] %s", rarity, name);
     }
+
+    @SuppressWarnings("WeakerAccess")
+    public @interface HTML { }
 }

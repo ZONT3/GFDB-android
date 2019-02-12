@@ -497,7 +497,11 @@ public class Parser {
                         new URL(dmg.getElementsByAttribute("href").first().attr("href"))
                 });
             }
-        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Aux CG", pe)); }
+        } catch (Exception pe) {
+            exceptions.add(new ParserException(doll, "Aux CG", pe));
+            doll.costitles = null;
+            doll.costumes = null;
+        }
 
         try {
             Elements roles = root.getElementsByAttributeValueContaining("class", "t-doll-roles");
@@ -506,14 +510,14 @@ public class Parser {
                 for (Element e : roles.first().getElementsByClass("field__item"))
                     b.append(" ").append(e.text());
                 doll.role = b.toString().replaceFirst(" ", "");
-            } else doll.role = "";
-        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Roles", pe)); doll.role = ""; }
+            } else doll.role = null;
+        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Roles", pe)); doll.role = null; }
 
         try {
             Element p = root.getElementsContainingOwnText("History").first().nextElementSibling();
             if (p.tagName().equals("p")) doll.description = p.text();
-            else doll.description = "";
-        }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.description = ""; }
+            else doll.description = null;
+        }  catch (Exception pe) { exceptions.add(new ParserException(doll, "Description", pe)); doll.description = null; }
 
         try {
             if (gftwRoot == null) throw new ParserException("gf.fws.tw page is absent");
@@ -536,7 +540,7 @@ public class Parser {
 
         try {
             doll.affect = root.getElementsByClass("adj-effects").first().text().replace("Affects ", "");
-        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Affect", pe)); doll.affect = ""; }
+        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Affect", pe)); doll.affect = null; }
         try {
             StringBuilder builder = new StringBuilder();
             Element table = root.getElementsByClass("adj-bonus").first().getElementsByTag("table").first();
@@ -550,14 +554,14 @@ public class Parser {
                             .append(val.text());
             }
             doll.buffs = builder.toString();
-        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Buffs", pe)); doll.buffs = ""; }
+        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Buffs", pe)); doll.buffs = null; }
         try {
             Element skills = root.getElementsByAttributeValue("id", "t-doll-skill").first().nextElementSibling();
             for (Element e : skills.getElementsByTag("img"))
                 e.attr("src", "https://girlsfrontline.gamepress.gg"
                         + e.attr("src"));
             doll.skills = skills.toString();
-        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = ""; }
+        } catch (Exception pe) { exceptions.add(new ParserException(doll, "Skills", pe)); doll.skills = null; }
 
         /* Макет блока парсинга
         try {
